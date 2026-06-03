@@ -1,7 +1,7 @@
 {
-  "name": "tae-oil500-v9-3-audit-final",
-  "version": "1.9.3",
-  "description": "Tae&oil500 V9.3 final audited build with fixed settings IDs",
+  "name": "tae-oil500-v9-4-real-fix",
+  "version": "1.9.4",
+  "description": "Tae&oil500 V9.4 real fix for broken summary ids and robust DOM bindings",
   "main": "index.html",
   "scripts": {
     "build": "echo \"Static site - no build step\""

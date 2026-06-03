@@ -87,7 +87,7 @@
         <div class="btns"><button class="btn small blue" onclick="refreshAndScan()">สแกนใหม่</button></div>
       </div>
       <div class="summaryGrid">
-        <div class="summaryCard"><small>ชุดที่สแกน</small><b id="sumชุดที่สแกน">-</b></div>
+        <div class="summaryCard"><small>ชุดที่สแกน</small><b id="sumUniverse">-</b></div>
         <div class="summaryCard"><small>ดึงได้</small><b id="sumFetched">0/0</b></div>
         <div class="summaryCard"><small>น่าซื้อ</small><b id="sumAplus">0</b></div>
         <div class="summaryCard"><small>น่าจับตา</small><b id="sumB">0</b></div>
@@ -127,9 +127,9 @@
         <div><label>มูลค่าซื้อขายขั้นต่ำ</label><input id="minมูลค่าซื้อขาย" type="number"></div>
         <div><label>ความคุ้มขั้นต่ำ</label><input id="minความคุ้ม" type="number" step="0.1"></div>
         <div><label>ชุดที่สแกน ปัจจุบัน</label><select id="universeSelect" onchange="setชุดที่สแกน(this.value)"><option value="watchlist">น่าจับตาlist</option><option value="thai">หุ้นไทยหลัก</option><option value="us">หุ้นสหรัฐหลัก</option><option value="gold">ทองคำ/เหมืองทอง</option><option value="all">All Core</option></select></div>
-        <div><label>จำนวนตัวที่ดึงเช็กกราฟสูงสุด</label><input id="deepLimit" type="number"></div>
-        <div><label>จำนวนตัวที่ดึงข้อมูลพื้นฐานสูงสุด</label><input id="fundLimit" type="number"></div>
-        <div><label>แสดง น่าจับตา</label><select id="showน่าจับตา"><option value="yes">แสดงตัวน่าซื้อและน่าจับตา</option><option value="no">แสดงเฉพาะ น่าซื้อ</option></select></div>
+        <div><label>จำนวนตัวที่เช็กกราฟละเอียด</label><input id="deepLimit" type="number"></div>
+        <div><label>จำนวนตัวที่เช็กข้อมูลพื้นฐาน</label><input id="fundLimit" type="number"></div>
+        <div><label>แสดงตัวน่าจับตา</label><select id="showWatch"><option value="yes">แสดงตัวน่าซื้อและน่าจับตา</option><option value="no">แสดงเฉพาะ น่าซื้อ</option></select></div>
       </div>
       <div class="btns" style="margin-top:10px">
         <button class="btn blue" onclick="setชุดที่สแกน('watchlist')">น่าจับตาlist</button>
@@ -157,6 +157,7 @@
 
 
 <script>
+const $id=(id)=>document.getElementById(id);
 const KEY='tae_oil_v9_multi_source_backup';
 const CACHE_KEY='tae_oil_last_good_quotes_v9';
 
@@ -179,6 +180,42 @@ const DEFAULT={
 };
 
 let state=loadState(), side='tae';
+const scanProgressBar=$id('scanProgressBar');
+const universeSelect=$id('universeSelect');
+const settingsPanel=$id('settingsPanel');
+const maxCacheHours=$id('maxCacheHours');
+const minTurnover=$id('minTurnover');
+const sumUniverse=$id('sumUniverse');
+const missingWrap=$id('missingWrap');
+const missingBox=$id('missingBox');
+const dailyTitle=$id('dailyTitle');
+const sumFetched=$id('sumFetched');
+const resultList=$id('resultList');
+const deepLimit=$id('deepLimit');
+const showWatch=$id('showWatch');
+const healthBox=$id('healthBox');
+const watchlist=$id('watchlist');
+const dailyNote=$id('dailyNote');
+const fundLimit=$id('fundLimit');
+const sideTitle=$id('sideTitle');
+const sumHealth=$id('sumHealth');
+const syncText=$id('syncText');
+const sumAplus=$id('sumAplus');
+const taeCount=$id('taeCount');
+const sideDesc=$id('sideDesc');
+const oilCount=$id('oilCount');
+const maxLoss=$id('maxLoss');
+const sumFund=$id('sumFund');
+const capital=$id('capital');
+const sumDeep=$id('sumDeep');
+const oilTab=$id('oilTab');
+const oilMin=$id('oilMin');
+const taeMin=$id('taeMin');
+const taeTab=$id('taeTab');
+const navOil=$id('navOil');
+const navTae=$id('navTae');
+const minRR=$id('minRR');
+const sumB=$id('sumB');
 
 function loadState(){try{return JSON.parse(localStorage.getItem(KEY))||structuredClone(DEFAULT)}catch(e){return structuredClone(DEFAULT)}}
 function saveState(){localStorage.setItem(KEY,JSON.stringify(state))}
