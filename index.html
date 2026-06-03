@@ -64,7 +64,7 @@
           <div class="mark">T&O</div>
           <div>
             <h1>Tae&oil500</h1>
-            <div class="sub">Yahoo Finance ผ่าน Netlify Function • ไม่ใช้ package เสริม</div>
+            <div class="sub">Yahoo Finance ผ่าน Netlify Function • fallback quote/chart</div>
           </div>
         </div>
         <div class="sync"><span class="dot"></span><span id="syncText">พร้อม</span></div>
@@ -217,14 +217,18 @@ async function refreshAndScan(){
   syncText.textContent='กำลังดึง Yahoo...';
   try{
     const res=await fetch('/.netlify/functions/yahoo?symbols='+encodeURIComponent(symbols().join(',')));
-    if(!res.ok) throw new Error('HTTP '+res.status);
-    const data=await res.json();
-    if(!data.ok) throw new Error(data.error||'Yahoo error');
+    const data=await res.json().catch(()=>null);
+    if(!res.ok) throw new Error((data&&data.error) ? data.error : 'HTTP '+res.status);
+    if(!data || !data.ok) throw new Error((data&&data.error) || 'Yahoo error');
     state.quotes=data.quotes||[];
     state.lastUpdate=new Date().toISOString();
     saveState();
     syncText.textContent='อัปเดตแล้ว';
-    showToast(`ดึงข้อมูล ${state.quotes.length} ตัว`);
+    if(state.quotes.length){
+      showToast(`ดึงข้อมูล ${state.quotes.length} ตัว`);
+    }else{
+      showToast('ดึงสำเร็จแต่ไม่มี symbol ที่ Yahoo ส่งกลับ');
+    }
   }catch(e){
     console.error(e);
     syncText.textContent='ดึงไม่ได้';

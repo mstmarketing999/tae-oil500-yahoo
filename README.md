@@ -1,18 +1,14 @@
-# Tae&oil500 Yahoo Scanner - Fetch Version
+# Tae&oil500 Yahoo Scanner - Fallback V3
 
-เวอร์ชันนี้ไม่ใช้ package `yahoo-finance2` แล้ว  
-Netlify Function ใช้ native `fetch` เรียก Yahoo Finance quote endpoint โดยตรงจากฝั่ง server
+เวอร์ชันนี้แก้ปัญหา HTTP 502 โดยให้ Function ไม่พึ่ง Yahoo endpoint เดียว
 
-## ไฟล์สำคัญ
+## วิธีทำงาน
 
-- `index.html`
-- `netlify.toml`
-- `package.json`
-- `netlify/functions/yahoo.js`
+1. เรียก Yahoo quote endpoint
+2. ถ้าบางตัวหรือทั้งหมดไม่มา จะ fallback ไป Yahoo chart endpoint รายตัว
+3. Function จะตอบกลับ JSON เสมอเท่าที่ทำได้ เพื่อไม่ให้เว็บพัง
 
-## วิธีอัปเดต GitHub
-
-ให้อัปโหลดไฟล์ทั้งหมดนี้ไปไว้หน้าแรกของ repo:
+## ไฟล์ที่ต้องอยู่หน้าแรก GitHub repo
 
 - index.html
 - netlify.toml
@@ -20,14 +16,13 @@ Netlify Function ใช้ native `fetch` เรียก Yahoo Finance quote en
 - README.md
 - netlify/functions/yahoo.js
 
-จากนั้นกลับไป Netlify แล้วกด:
+## หลังอัปโหลด
 
-Deploys → Trigger deploy → Clear cache and deploy site
+Netlify → Deploys → Trigger deploy → Clear cache and deploy site
 
-## Test Function
+## ทดสอบ
 
-หลัง deploy เสร็จ ลองเปิด:
-
+เปิด:
 `https://YOUR-SITE.netlify.app/.netlify/functions/yahoo?symbols=MSFT,NVDA,PTT.BK`
 
-ถ้าถูกต้องต้องได้ JSON ไม่ใช่ 404/502
+ถ้าสำเร็จต้องได้ JSON ที่มี `"ok": true`
