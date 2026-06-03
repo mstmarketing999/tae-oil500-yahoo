@@ -51,7 +51,7 @@
     .reason{border-left:4px solid var(--gold);padding:9px 10px;margin-top:10px;border-radius:13px;background:rgba(243,196,77,.09);color:#fde68a;font-size:13px;line-height:1.48}.danger{border-left:4px solid var(--red);padding:9px 10px;margin-top:10px;border-radius:13px;background:rgba(239,68,68,.09);color:#fecaca;font-size:13px;line-height:1.48}
     .formgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}label{display:block;font-size:12px;color:var(--muted);margin:0 0 5px}input,textarea{width:100%;border-radius:14px;border:1px solid rgba(255,255,255,.11);background:rgba(2,8,23,.48);color:var(--text);padding:11px 12px;outline:none}textarea{min-height:120px;resize:vertical}input:focus,textarea:focus{border-color:rgba(243,196,77,.7);box-shadow:0 0 0 3px rgba(243,196,77,.12)}
     .bottom{position:fixed;left:0;right:0;bottom:0;z-index:20;padding:9px 10px calc(9px + env(safe-area-inset-bottom));background:rgba(5,9,18,.92);backdrop-filter:blur(18px);border-top:1px solid var(--line)}.bottomInner{max-width:540px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr 54px;gap:8px}.nav{padding:10px 8px;border-radius:16px;background:rgba(255,255,255,.06);color:var(--muted);border:1px solid rgba(255,255,255,.08);font-weight:850}.nav.active{background:rgba(243,196,77,.15);color:#fde68a;border-color:rgba(243,196,77,.28)}.nav.gear{font-size:19px}
-    .hide{display:none!important}.mini{font-size:12px;color:var(--muted);line-height:1.45}.warn{margin-top:10px;border-radius:16px;background:rgba(251,146,60,.10);border-left:4px solid var(--orange);padding:10px 12px;color:#fed7aa;font-size:13px;line-height:1.45}
+    .hide{display:none!important}.mini{font-size:12px;color:var(--muted);line-height:1.45}.warn{margin-top:10px;border-radius:16px;background:rgba(251,146,60,.10);border-left:4px solid var(--orange);padding:10px 12px;color:#fed7aa;font-size:13px;line-height:1.45}.progressLine{height:10px;border-radius:99px;background:rgba(255,255,255,.09);overflow:hidden;margin-top:10px}.progressLine i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--gold),var(--green));border-radius:99px;transition:.25s}
     .toast{position:fixed;left:50%;bottom:86px;transform:translateX(-50%);z-index:80;background:#0f1f36;border:1px solid rgba(255,255,255,.12);border-radius:999px;padding:10px 14px;box-shadow:var(--shadow);color:#fff;font-size:13px}
     @media(max-width:560px){.hero h2{font-size:20px}.tabs{gap:8px}.tab{padding:13px;min-height:104px}.tab b{font-size:17px;grid-template-columns:minmax(0,1fr) auto}.count{min-width:30px;height:30px}.numbers,.formgrid{grid-template-columns:1fr}.stockTop{align-items:center}}
   </style>
@@ -64,7 +64,7 @@
           <div class="mark">T&O</div>
           <div>
             <h1>Tae&oil500</h1>
-            <div class="sub">Yahoo Finance ผ่าน Netlify Function • fallback quote/chart</div>
+            <div class="sub">Universe Scanner • หุ้นไทย/สหรัฐ/ETF/ทองคำ</div>
           </div>
         </div>
         <div class="sync"><span class="dot"></span><span id="syncText">พร้อม</span></div>
@@ -73,7 +73,7 @@
 
     <section class="hero">
       <h2 id="dailyTitle">วันนี้มีหุ้นผ่านเกณฑ์ไหม?</h2>
-      <p id="dailyNote">กดสแกนเพื่อดึงราคาและ volume ล่าสุดจาก Yahoo Finance แล้วกรองเป็น 2 ฝั่ง: TAE VI / Oil หุ้นซิ่ง</p>
+      <p id="dailyNote">เลือก Universe แล้วกดสแกน ระบบจะทยอยดึงหุ้นหลายตัว รวมถึง ETF ทองคำ/เหมืองทอง แล้วคัดเหลือเฉพาะตัวที่ผ่านเกณฑ์</p>
     </section>
 
     <section class="tabs">
@@ -93,7 +93,7 @@
           <h2 id="sideTitle">TAE VI — หุ้นที่ผ่านเกณฑ์</h2>
           <p id="sideDesc">ผ่านก็ขึ้น ไม่ผ่านก็ 0</p>
         </div>
-        <div class="btns"><button class="btn small blue" onclick="refreshAndScan()">ดึง Yahoo + สแกน</button></div>
+        <div class="btns"><button class="btn small blue" onclick="refreshAndScan()">สแกน Universe</button></div>
       </div>
       <div id="resultList"></div>
     </section>
@@ -114,10 +114,17 @@
         <div><label>TAE เกณฑ์ขั้นต่ำ</label><input id="taeMin" type="number"></div>
         <div><label>Oil เกณฑ์ขั้นต่ำ</label><input id="oilMin" type="number"></div>
       </div>
+      <div class="btns" style="margin-top:10px">
+        <button class="btn blue" onclick="setUniverse('watchlist')">Watchlist</button>
+        <button class="btn blue" onclick="setUniverse('thai')">หุ้นไทยหลัก</button>
+        <button class="btn blue" onclick="setUniverse('us')">หุ้นสหรัฐหลัก</button>
+        <button class="btn blue" onclick="setUniverse('gold')">ทองคำ/เหมืองทอง</button>
+        <button class="btn primary" onclick="setUniverse('all')">All Core</button>
+      </div>
       <div style="margin-top:10px"><label>Watchlist คั่นด้วย comma</label><textarea id="watchlist"></textarea></div>
       <div style="margin-top:10px"><label>ข้อมูลพื้นฐาน/มูลค่า แบบ JSON ปรับเองได้</label><textarea id="manualJson"></textarea></div>
       <div class="btns" style="margin-top:10px">
-        <button class="btn blue" onclick="refreshAndScan()">ดึงข้อมูล Yahoo</button>
+        <button class="btn blue" onclick="refreshAndScan()">สแกน Universe</button>
         <button class="btn red" onclick="resetAll()">รีเซ็ต</button>
       </div>
       <div class="mini" style="margin-top:10px">หมายเหตุ: Yahoo ให้ราคา/volume ได้ แต่ fairValue, quality, debt, growth เป็นข้อมูลประเมินเองใน JSON นี้ เพื่อคัดฝั่ง VI</div>
@@ -133,9 +140,39 @@
   </nav>
 
 <script>
-const KEY='tae_oil_yahoo_v1';
+const KEY='tae_oil_universe_v4';
+
+const UNIVERSES = {
+  watchlist: ['MSFT','NVDA','AAPL','TSLA','SPY','QQQ','PTT.BK','CPALL.BK','AOT.BK','ADVANC.BK','GLD','IAU','GDX'],
+  thai: [
+    'PTT.BK','PTTEP.BK','AOT.BK','ADVANC.BK','CPALL.BK','BDMS.BK','KBANK.BK','BBL.BK','KTB.BK','SCB.BK',
+    'DELTA.BK','GULF.BK','TRUE.BK','CPN.BK','CRC.BK','HMPRO.BK','GLOBAL.BK','MINT.BK','BH.BK','BEM.BK',
+    'BTS.BK','TOP.BK','GPSC.BK','EA.BK','OR.BK','TISCO.BK','INTUCH.BK','TU.BK','SCC.BK','SCGP.BK',
+    'CBG.BK','OSP.BK','COM7.BK','KCE.BK','HANA.BK','BGRIM.BK','RATCH.BK','WHA.BK','AMATA.BK','CENTEL.BK',
+    'TIDLOR.BK','SAWAD.BK','MTC.BK','KKP.BK','AP.BK','LH.BK','SPALI.BK','ORI.BK','AWC.BK','ERW.BK',
+    'PLANB.BK','VGI.BK','DOHOME.BK','MEGA.BK','CHG.BK','BCH.BK','JMT.BK','JMART.BK','SINGER.BK','FORTH.BK'
+  ],
+  us: [
+    'AAPL','MSFT','NVDA','AMZN','GOOGL','META','TSLA','AVGO','AMD','NFLX','COST','ADBE','CRM','ORCL','NOW',
+    'INTC','QCOM','TXN','AMAT','MU','SMCI','JPM','BAC','GS','V','MA','PYPL','XOM','CVX','COP',
+    'LLY','UNH','JNJ','MRK','ABBV','PFE','WMT','HD','MCD','NKE','SBUX','DIS','UBER','SHOP','COIN',
+    'SPY','QQQ','DIA','IWM','XLK','XLF','XLE','XLV','XLY','XLP','TLT','HYG'
+  ],
+  gold: [
+    'GC=F','GLD','IAU','SGOL','PHYS','GDX','GDXJ','NEM','GOLD','AEM','KGC','FNV','WPM','RGLD','AU','SIL','SLV'
+  ]
+};
+UNIVERSES.all = [...new Set([...UNIVERSES.thai, ...UNIVERSES.us, ...UNIVERSES.gold])];
+
 const DEFAULT = {
-  settings:{capital:10000000,maxLoss:300000,taeMin:78,oilMin:72,watchlist:'MSFT,NVDA,AAPL,TSLA,SPY,QQQ,PTT.BK,CPALL.BK,AOT.BK,ADVANC.BK'},
+  settings:{
+    capital:10000000,
+    maxLoss:300000,
+    taeMin:78,
+    oilMin:72,
+    universe:'all',
+    watchlist:UNIVERSES.watchlist.join(',')
+  },
   manual:{
     'MSFT':{name:'Microsoft',fairValue:510,quality:94,debt:18,growth:78,dividend:42},
     'NVDA':{name:'NVIDIA',fairValue:122,quality:84,debt:15,growth:95,dividend:5},
@@ -146,22 +183,39 @@ const DEFAULT = {
     'PTT.BK':{name:'PTT',fairValue:42,quality:70,debt:35,growth:45,dividend:60},
     'CPALL.BK':{name:'CPALL',fairValue:72,quality:78,debt:46,growth:68,dividend:32},
     'AOT.BK':{name:'AOT',fairValue:78,quality:80,debt:35,growth:70,dividend:20},
-    'ADVANC.BK':{name:'ADVANC',fairValue:245,quality:86,debt:22,growth:55,dividend:70}
+    'ADVANC.BK':{name:'ADVANC',fairValue:245,quality:86,debt:22,growth:55,dividend:70},
+    'GLD':{name:'SPDR Gold Shares',fairValue:250,quality:78,debt:5,growth:50,dividend:0},
+    'IAU':{name:'iShares Gold Trust',fairValue:55,quality:78,debt:5,growth:50,dividend:0},
+    'GDX':{name:'Gold Miners ETF',fairValue:42,quality:60,debt:25,growth:55,dividend:20},
+    'GC=F':{name:'Gold Futures',fairValue:2500,quality:80,debt:0,growth:50,dividend:0}
   },
   quotes:[],
-  lastUpdate:null
+  lastUpdate:null,
+  lastRequested:0,
+  lastUniverse:'all'
 };
 let state=loadState(), side='tae';
+
 function loadState(){try{return JSON.parse(localStorage.getItem(KEY))||structuredClone(DEFAULT)}catch(e){return structuredClone(DEFAULT)}}
 function saveState(){localStorage.setItem(KEY,JSON.stringify(state))}
 function fmt(n){return new Intl.NumberFormat('th-TH',{maximumFractionDigits:0}).format(Number(n||0))}
 function f2(n){return Number(n||0).toFixed(2)}
 function pct(n){return `${Number(n||0).toFixed(1)}%`}
-function symbols(){return state.settings.watchlist.split(',').map(s=>s.trim().toUpperCase()).filter(Boolean)}
-function quoteMap(){const m={}; for(const q of state.quotes||[]) m[q.symbol.toUpperCase()]=q; return m}
+function unique(arr){return [...new Set(arr.map(s=>String(s).trim().toUpperCase()).filter(Boolean))]}
+function selectedSymbols(){
+  const mode=state.settings.universe||'all';
+  if(mode==='watchlist') return unique((state.settings.watchlist||'').split(','));
+  return unique(UNIVERSES[mode] || UNIVERSES.all);
+}
+function quoteMap(){const m={}; for(const q of state.quotes||[]) m[String(q.symbol||'').toUpperCase()]=q; return m}
+function isGold(sym){return ['GC=F','GLD','IAU','SGOL','PHYS','GDX','GDXJ','NEM','GOLD','AEM','KGC','FNV','WPM','RGLD','AU','SIL','SLV'].includes(sym)}
+function estimateRsi(changePct, volumeSpike){
+  let r=50 + changePct*4 + Math.min(12, volumeSpike*4);
+  return Math.max(20, Math.min(82, Math.round(r)));
+}
 function buildAssets(){
   const qm=quoteMap();
-  return symbols().map(sym=>{
+  return selectedSymbols().map(sym=>{
     const q=qm[sym]||{};
     const man=state.manual[sym]||{};
     const price=Number(q.regularMarketPrice||0);
@@ -171,41 +225,39 @@ function buildAssets(){
     const changePct=prev>0?((price-prev)/prev*100):0;
     const volumeSpike=avgVolume>0?volume/avgVolume:0;
     const high=Number(q.regularMarketDayHigh||0), low=Number(q.regularMarketDayLow||0);
-    const breakout = price>0 && high>0 && price >= high*0.992 && volumeSpike>=1.15;
+    const breakout = price>0 && high>0 && price >= high*0.992 && volumeSpike>=0.95;
     const rsi = estimateRsi(changePct, volumeSpike);
     const support = low>0 ? low : price*0.97;
-    const oilTarget = price * (1 + Math.min(0.05, Math.max(0.018, Math.abs(changePct)/100 + 0.015)));
-    const stop = price * 0.97;
+    const oilTarget = price * (1 + Math.min(0.055, Math.max(0.018, Math.abs(changePct)/100 + 0.015)));
+    const stop = price * (isGold(sym)?0.985:0.97);
     return {symbol:sym,name:man.name||q.shortName||q.longName||sym,price,prev,volume,avgVolume,changePct,volumeSpike,rsi,breakout,
-      fairValue:Number(man.fairValue||price*1.08),quality:Number(man.quality||55),debt:Number(man.debt||40),
+      fairValue:Number(man.fairValue||price*1.08),quality:Number(man.quality||(isGold(sym)?76:55)),debt:Number(man.debt||(isGold(sym)?5:40)),
       growth:Number(man.growth||50),dividend:Number(man.dividend||0),support,target: side==='oil'?oilTarget:(Number(man.fairValue||price*1.08)),stop,
-      currency:q.currency|| (sym.endsWith('.BK')?'THB':'USD'), note:q.marketState?`Market: ${q.marketState}`:''}
+      currency:q.currency|| (sym.endsWith('.BK')?'THB':'USD'), note:q.marketState?`Market: ${q.marketState}`:'', gold:isGold(sym)}
   }).filter(a=>a.price>0)
-}
-function estimateRsi(changePct, volumeSpike){
-  let r=50 + changePct*4 + Math.min(12, volumeSpike*4);
-  return Math.max(20, Math.min(82, Math.round(r)));
 }
 function taeScore(a){
   const margin=((a.fairValue-a.price)/a.price)*100;
   const marginScore=Math.max(0,Math.min(100,margin*4));
   const debtScore=Math.max(0,100-a.debt*1.4);
   const stability=Math.max(0,100-Math.abs(a.changePct)*8);
-  return Math.round(a.quality*.30+marginScore*.25+debtScore*.15+a.growth*.12+a.dividend*.08+stability*.10);
+  const goldBonus=a.gold?6:0;
+  return Math.round(a.quality*.30+marginScore*.25+debtScore*.15+a.growth*.12+a.dividend*.08+stability*.10+goldBonus);
 }
 function oilScore(a){
-  const volumeScore=Math.min(100,a.volumeSpike*42);
+  const volumeScore=Math.min(100,a.volumeSpike*44);
   const breakoutScore=a.breakout?100:25;
-  const rsiScore=a.rsi>=52&&a.rsi<=74?92:a.rsi>78?35:52;
+  const rsiScore=a.rsi>=52&&a.rsi<=76?92:a.rsi>78?35:52;
   const moveScore=a.changePct>0?Math.min(100,a.changePct*18):15;
-  return Math.round(volumeScore*.34+breakoutScore*.28+rsiScore*.18+moveScore*.12+a.quality*.08);
+  const goldBonus=a.gold?4:0;
+  return Math.round(volumeScore*.34+breakoutScore*.28+rsiScore*.18+moveScore*.12+a.quality*.08+goldBonus);
 }
 function passTae(a){
   const margin=((a.fairValue-a.price)/a.price)*100;
-  return taeScore(a)>=state.settings.taeMin && a.quality>=70 && margin>=8 && a.debt<=55;
+  return taeScore(a)>=state.settings.taeMin && a.quality>=68 && margin>=6 && a.debt<=60;
 }
 function passOil(a){
-  return oilScore(a)>=state.settings.oilMin && a.volumeSpike>=1.05 && a.breakout && a.rsi>=52 && a.rsi<=76;
+  return oilScore(a)>=state.settings.oilMin && a.volumeSpike>=0.85 && (a.breakout || a.changePct>1.2) && a.rsi>=52 && a.rsi<=78;
 }
 function getPassed(){
   const assets=buildAssets();
@@ -214,21 +266,23 @@ function getPassed(){
   return {tae,oil,all:assets};
 }
 async function refreshAndScan(){
-  syncText.textContent='กำลังดึง Yahoo...';
+  const syms=selectedSymbols();
+  syncText.textContent=`สแกน 0/${syms.length}`;
+  ensureProgress();
+  setProgress(0);
   try{
-    const res=await fetch('/.netlify/functions/yahoo?symbols='+encodeURIComponent(symbols().join(',')));
+    const res=await fetch('/.netlify/functions/yahoo?symbols='+encodeURIComponent(syms.join(',')));
     const data=await res.json().catch(()=>null);
     if(!res.ok) throw new Error((data&&data.error) ? data.error : 'HTTP '+res.status);
     if(!data || !data.ok) throw new Error((data&&data.error) || 'Yahoo error');
     state.quotes=data.quotes||[];
     state.lastUpdate=new Date().toISOString();
+    state.lastRequested=syms.length;
+    state.lastUniverse=state.settings.universe||'all';
     saveState();
+    setProgress(100);
     syncText.textContent='อัปเดตแล้ว';
-    if(state.quotes.length){
-      showToast(`ดึงข้อมูล ${state.quotes.length} ตัว`);
-    }else{
-      showToast('ดึงสำเร็จแต่ไม่มี symbol ที่ Yahoo ส่งกลับ');
-    }
+    showToast(`ดึงได้ ${state.quotes.length}/${syms.length} ตัว`);
   }catch(e){
     console.error(e);
     syncText.textContent='ดึงไม่ได้';
@@ -237,15 +291,29 @@ async function refreshAndScan(){
   render();
   setTimeout(()=>syncText.textContent='พร้อม',1600);
 }
+function ensureProgress(){
+  if(!document.getElementById('scanProgress')){
+    const div=document.createElement('div');
+    div.className='progressLine';
+    div.id='scanProgress';
+    div.innerHTML='<i id="scanProgressBar"></i>';
+    document.querySelector('.hero').appendChild(div);
+  }
+}
+function setProgress(v){
+  const bar=document.getElementById('scanProgressBar');
+  if(bar) bar.style.width=v+'%';
+}
 function render(){
   const p=getPassed();
   taeCount.textContent=p.tae.length; oilCount.textContent=p.oil.length;
   taeTab.classList.toggle('active',side==='tae'); oilTab.classList.toggle('active',side==='oil'); navTae.classList.toggle('active',side==='tae'); navOil.classList.toggle('active',side==='oil');
   const list=side==='tae'?p.tae:p.oil;
-  sideTitle.textContent=side==='tae'?'TAE VI — หุ้นที่ผ่านเกณฑ์':'Oil หุ้นซิ่ง — ตัวที่น่าเล่นวันนี้';
-  sideDesc.textContent=side==='tae'?'คัดเฉพาะตัวที่ราคาเทียบมูลค่ายังพอมีส่วนลด และคุณภาพไม่แย่':'คัดเฉพาะตัวที่ Volume เข้าและวิ่งใกล้ High ของวัน';
+  sideTitle.textContent=side==='tae'?'TAE VI — หุ้น/ทองที่ผ่านเกณฑ์':'Oil หุ้นซิ่ง/ทอง — ตัวที่น่าเล่นวันนี้';
+  sideDesc.textContent=side==='tae'?'คัดเฉพาะตัวที่ราคาเทียบมูลค่ายังพอมีส่วนลด และคุณภาพไม่แย่':'คัดเฉพาะตัวที่ Volume/โมเมนตัมเข้าและราคาแข็ง';
+  const syms=selectedSymbols();
   dailyTitle.textContent=`วันนี้ผ่านเกณฑ์: TAE ${p.tae.length} / Oil ${p.oil.length}`;
-  dailyNote.textContent=state.lastUpdate?`อัปเดตล่าสุด ${new Date(state.lastUpdate).toLocaleString('th-TH')} • ดึงได้ ${state.quotes.length}/${symbols().length} ตัว`:'ยังไม่ได้ดึงข้อมูล Yahoo กด “ดึง Yahoo + สแกน” ก่อน';
+  dailyNote.textContent=state.lastUpdate?`อัปเดตล่าสุด ${new Date(state.lastUpdate).toLocaleString('th-TH')} • Universe: ${state.lastUniverse} • ดึงได้ ${state.quotes.length}/${state.lastRequested||syms.length} ตัว`:`Universe ปัจจุบัน: ${state.settings.universe||'all'} • เตรียมสแกน ${syms.length} ตัว`;
   resultList.innerHTML=list.length?`<div class="list">${list.map(card).join('')}</div>`:emptyHtml();
   capital.value=state.settings.capital; maxLoss.value=state.settings.maxLoss; taeMin.value=state.settings.taeMin; oilMin.value=state.settings.oilMin; watchlist.value=state.settings.watchlist; manualJson.value=JSON.stringify(state.manual,null,2);
 }
@@ -258,26 +326,33 @@ function card(a){
   const qty=Math.floor(state.settings.maxLoss/riskPerShare);
   const moneyNeed=qty*a.price;
   const reason=side==='tae'
-    ? `ผ่านเพราะคะแนน VI ${a.score}, quality ${a.quality}, ส่วนต่างมูลค่า ${pct(margin)}, หนี้ ${a.debt}`
-    : `ผ่านเพราะ volume ${a.volumeSpike.toFixed(2)}x, ราคาเปลี่ยน ${pct(a.changePct)}, RSI ประเมิน ${a.rsi}, breakout ${a.breakout?'ใช่':'ไม่ใช่'}`;
+    ? `ผ่านเพราะคะแนน VI ${a.score}, quality ${a.quality}, ส่วนต่างมูลค่า ${pct(margin)}, หนี้ ${a.debt}${a.gold?' • กลุ่มทองคำ':''}`
+    : `ผ่านเพราะ volume ${a.volumeSpike.toFixed(2)}x, ราคาเปลี่ยน ${pct(a.changePct)}, RSI ประเมิน ${a.rsi}, breakout ${a.breakout?'ใช่':'ไม่ใช่'}${a.gold?' • กลุ่มทองคำ':''}`;
   return `<article class="stock">
     <div class="stockTop"><div><div class="sym">${a.symbol}</div><div class="name">${a.name} • ${a.currency}</div></div><div class="score ${side==='oil'?'hot':''}">${a.score}</div></div>
-    <div class="tags"><span class="tag green">ผ่านเกณฑ์</span><span class="tag ${side==='tae'?'gold':'green'}">${side==='tae'?'VI':'ซิ่ง'}</span><span class="tag">Vol ${a.volumeSpike.toFixed(2)}x</span><span class="tag">${pct(a.changePct)}</span></div>
+    <div class="tags"><span class="tag green">ผ่านเกณฑ์</span><span class="tag ${side==='tae'?'gold':'green'}">${side==='tae'?'VI':'ซิ่ง'}</span><span class="tag">Vol ${a.volumeSpike.toFixed(2)}x</span><span class="tag">${pct(a.changePct)}</span>${a.gold?'<span class="tag gold">ทองคำ</span>':''}</div>
     <div class="numbers"><div class="num"><small>ราคา</small><b>${f2(a.price)}</b></div><div class="num"><small>เป้า</small><b>${f2(a.target)}</b></div><div class="num"><small>คัท</small><b>${f2(a.stop)}</b></div></div>
     <div class="reason">${reason}</div>
-    <div class="danger">ถ้ายอมเสีย ${fmt(state.settings.maxLoss)} บาท ซื้อได้ประมาณ ${fmt(qty)} หุ้น ใช้เงินราว ${fmt(moneyNeed)} ${a.currency}</div>
+    <div class="danger">ถ้ายอมเสีย ${fmt(state.settings.maxLoss)} บาท ซื้อได้ประมาณ ${fmt(qty)} หุ้น/หน่วย ใช้เงินราว ${fmt(moneyNeed)} ${a.currency}</div>
     <div class="mini" style="margin-top:8px">${a.note||''}</div>
   </article>`;
+}
+function setUniverse(mode){
+  state.settings.universe=mode;
+  if(mode!=='watchlist') state.settings.watchlist=UNIVERSES[mode].join(',');
+  saveState();
+  render();
+  showToast(`เลือก Universe: ${mode} (${selectedSymbols().length} ตัว)`);
 }
 function setSide(s){side=s;settingsPanel.classList.add('hide');render();window.scrollTo({top:0,behavior:'smooth'})}
 function toggleSettings(){settingsPanel.classList.toggle('hide'); if(!settingsPanel.classList.contains('hide')) setTimeout(()=>settingsPanel.scrollIntoView({behavior:'smooth'}),50)}
 function saveSettings(){
   try{state.manual=JSON.parse(manualJson.value)}catch(e){showToast('Manual JSON ไม่ถูกต้อง');return}
-  state.settings={capital:+capital.value||0,maxLoss:+maxLoss.value||0,taeMin:+taeMin.value||78,oilMin:+oilMin.value||72,watchlist:watchlist.value||DEFAULT.settings.watchlist};
+  state.settings={capital:+capital.value||0,maxLoss:+maxLoss.value||0,taeMin:+taeMin.value||78,oilMin:+oilMin.value||72,universe:state.settings.universe||'all',watchlist:watchlist.value||DEFAULT.settings.watchlist};
   saveState();render();showToast('บันทึกแล้ว');
 }
 function resetAll(){if(confirm('รีเซ็ตทั้งหมด?')){localStorage.removeItem(KEY);location.reload()}}
-function showToast(msg){const old=document.querySelector('.toast');if(old)old.remove();const t=document.createElement('div');t.className='toast';t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),1800)}
+function showToast(msg){const old=document.querySelector('.toast');if(old)old.remove();const t=document.createElement('div');t.className='toast';t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),2200)}
 render();
 </script>
 </body>

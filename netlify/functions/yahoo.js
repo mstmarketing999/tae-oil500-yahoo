@@ -8,6 +8,12 @@ const BASE_HEADERS = {
 const UA =
   "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/124 Safari/537.36";
 
+function chunk(arr, size) {
+  const out = [];
+  for (let i = 0; i < arr.length; i += size) out.push(arr.slice(i, i + size));
+  return out;
+}
+
 async function fetchJson(url) {
   const res = await fetch(url, {
     headers: {
@@ -45,7 +51,6 @@ async function quoteEndpoint(symbols) {
 }
 
 async function chartEndpoint(symbol) {
-  // chart endpoint usually works even when quote endpoint is blocked/throttled.
   const url =
     "https://query1.finance.yahoo.com/v8/finance/chart/" +
     encodeURIComponent(symbol) +
@@ -57,7 +62,7 @@ async function chartEndpoint(symbol) {
 
   const meta = result.meta || {};
   const quote = result.indicators?.quote?.[0] || {};
-  const closes = (result.indicators?.quote?.[0]?.close || []).filter((v) => typeof v === "number");
+  const closes = (quote.close || []).filter((v) => typeof v === "number");
   const opens = (quote.open || []).filter((v) => typeof v === "number");
   const highs = (quote.high || []).filter((v) => typeof v === "number");
   const lows = (quote.low || []).filter((v) => typeof v === "number");
@@ -65,12 +70,10 @@ async function chartEndpoint(symbol) {
 
   const last = (arr) => arr.length ? arr[arr.length - 1] : undefined;
   const prev = closes.length >= 2 ? closes[closes.length - 2] : meta.previousClose;
-
   const recentVols = vols.slice(-20);
-  const avgVol =
-    recentVols.length
-      ? Math.round(recentVols.reduce((a, b) => a + b, 0) / recentVols.length)
-      : undefined;
+  const avgVol = recentVols.length
+    ? Math.round(recentVols.reduce((a, b) => a + b, 0) / recentVols.length)
+    : undefined;
 
   return {
     symbol,
@@ -94,48 +97,39 @@ exports.handler = async (event) => {
 
   try {
     const raw = event.queryStringParameters?.symbols || "";
-    const symbols = raw
+    const symbols = [...new Set(raw
       .split(",")
       .map((s) => s.trim().toUpperCase())
-      .filter(Boolean)
-      .slice(0, 40);
+      .filter(Boolean))]
+      .slice(0, 220);
 
     if (!symbols.length) {
-      return {
-        statusCode: 400,
-        headers,
-        body: JSON.stringify({ ok: false, error: "No symbols provided" })
-      };
+      return { statusCode: 400, headers, body: JSON.stringify({ ok: false, error: "No symbols provided" }) };
     }
 
     let quotes = [];
     const errors = [];
 
-    // 1) Try normal quote endpoint first.
-    try {
-      quotes = await quoteEndpoint(symbols);
-    } catch (e) {
-      errors.push({
-        stage: "quote",
-        message: e.message,
-        status: e.status || null,
-        detail: e.detail || ""
-      });
+    // Quote endpoint in batches to avoid huge URLs and reduce blocking.
+    for (const group of chunk(symbols, 45)) {
+      try {
+        const q = await quoteEndpoint(group);
+        quotes.push(...q);
+      } catch (e) {
+        errors.push({ stage: "quote", group: group.join(","), message: e.message, status: e.status || null, detail: e.detail || "" });
+      }
     }
 
     const got = new Set((quotes || []).map((q) => String(q.symbol || "").toUpperCase()));
     const missing = symbols.filter((s) => !got.has(s));
 
-    // 2) Fallback per-symbol chart endpoint for missing symbols or if quote failed.
-    if (missing.length) {
-      const fallbackResults = await Promise.allSettled(
-        missing.map(async (symbol) => chartEndpoint(symbol))
-      );
-
-      for (let i = 0; i < fallbackResults.length; i++) {
-        const r = fallbackResults[i];
-        const symbol = missing[i];
-
+    // Fallback chart endpoint, but cap to avoid timeout. Prioritize first 80 missing.
+    const fallbackTargets = missing.slice(0, 80);
+    for (const group of chunk(fallbackTargets, 8)) {
+      const results = await Promise.allSettled(group.map((symbol) => chartEndpoint(symbol)));
+      for (let i = 0; i < results.length; i++) {
+        const r = results[i];
+        const symbol = group[i];
         if (r.status === "fulfilled" && r.value && r.value.regularMarketPrice) {
           quotes.push(r.value);
         } else {
@@ -150,27 +144,30 @@ exports.handler = async (event) => {
       }
     }
 
+    // Deduplicate.
+    const bySymbol = {};
+    for (const q of quotes) {
+      if (q && q.symbol) bySymbol[String(q.symbol).toUpperCase()] = q;
+    }
+    quotes = Object.values(bySymbol);
+
     return {
       statusCode: 200,
       headers,
       body: JSON.stringify({
         ok: true,
-        source: "Yahoo Finance quote endpoint + chart fallback",
+        source: "Yahoo Finance quote batches + chart fallback",
         requested: symbols.length,
         count: quotes.length,
         quotes,
-        errors
+        errors: errors.slice(0, 30)
       })
     };
   } catch (err) {
     return {
       statusCode: 200,
       headers,
-      body: JSON.stringify({
-        ok: false,
-        error: err.message || "Function failed",
-        quotes: []
-      })
+      body: JSON.stringify({ ok: false, error: err.message || "Function failed", quotes: [] })
     };
   }
 };
