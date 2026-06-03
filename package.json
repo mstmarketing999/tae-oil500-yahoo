@@ -1,7 +1,7 @@
 {
-  "name": "tae-oil500-universe-v4",
-  "version": "1.3.0",
-  "description": "Tae&oil500 Universe Scanner with Thai, US, ETF, and gold tickers",
+  "name": "tae-oil500-v8-fundamental-upgrade",
+  "version": "1.8.0",
+  "description": "Tae&oil500 V8 with Yahoo price chart indicators and free fundamentals",
   "main": "index.html",
   "scripts": {
     "build": "echo \"Static site - no build step\""

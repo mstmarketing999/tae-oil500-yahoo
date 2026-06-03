@@ -1,173 +1,197 @@
-const BASE_HEADERS = {
+const HEADERS = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "Content-Type",
   "Content-Type": "application/json; charset=utf-8",
   "Cache-Control": "public, max-age=60"
 };
+const UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/124 Safari/537.36";
 
-const UA =
-  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/124 Safari/537.36";
-
-function chunk(arr, size) {
-  const out = [];
-  for (let i = 0; i < arr.length; i += size) out.push(arr.slice(i, i + size));
-  return out;
+function chunk(arr,size){const out=[];for(let i=0;i<arr.length;i+=size)out.push(arr.slice(i,i+size));return out}
+function avg(arr){const a=arr.filter(v=>typeof v==="number"&&!Number.isNaN(v));return a.length?a.reduce((x,y)=>x+y,0)/a.length:undefined}
+function sma(values,n){return values.length>=n?avg(values.slice(-n)):undefined}
+function high(values,n){const a=values.slice(-n).filter(v=>typeof v==="number");return a.length?Math.max(...a):undefined}
+function low(values,n){const a=values.slice(-n).filter(v=>typeof v==="number");return a.length?Math.min(...a):undefined}
+function raw(v){
+  if(v==null)return undefined;
+  if(typeof v==="number")return v;
+  if(typeof v==="object"&&typeof v.raw==="number")return v.raw;
+  return undefined;
 }
-
-async function fetchJson(url) {
-  const res = await fetch(url, {
-    headers: {
-      "User-Agent": UA,
-      "Accept": "application/json,text/plain,*/*",
-      "Accept-Language": "en-US,en;q=0.9,th;q=0.8"
-    }
-  });
-
-  const text = await res.text();
-
-  if (!res.ok) {
-    const err = new Error(`Upstream HTTP ${res.status}`);
-    err.status = res.status;
-    err.detail = text.slice(0, 300);
-    throw err;
+function rsi(values,period=14){
+  const closes=values.filter(v=>typeof v==="number");
+  if(closes.length<period+1)return undefined;
+  let gains=0,losses=0;
+  const start=closes.length-period;
+  for(let i=start;i<closes.length;i++){
+    const diff=closes[i]-closes[i-1];
+    if(diff>=0)gains+=diff; else losses-=diff;
   }
-
-  try {
-    return JSON.parse(text);
-  } catch (e) {
-    const err = new Error("Upstream returned non-JSON");
-    err.detail = text.slice(0, 300);
-    throw err;
+  const avgGain=gains/period, avgLoss=losses/period;
+  if(avgLoss===0)return 100;
+  const rs=avgGain/avgLoss;
+  return 100-(100/(1+rs));
+}
+function atr(highs,lows,closes,period=14){
+  const h=highs.filter(v=>typeof v==="number"), l=lows.filter(v=>typeof v==="number"), c=closes.filter(v=>typeof v==="number");
+  const len=Math.min(h.length,l.length,c.length);
+  if(len<period+1)return undefined;
+  const trs=[];
+  for(let i=len-period;i<len;i++){
+    const tr=Math.max(h[i]-l[i], Math.abs(h[i]-c[i-1]), Math.abs(l[i]-c[i-1]));
+    trs.push(tr);
   }
+  return avg(trs);
 }
-
-async function quoteEndpoint(symbols) {
-  const url =
-    "https://query1.finance.yahoo.com/v7/finance/quote?symbols=" +
-    encodeURIComponent(symbols.join(","));
-
-  const data = await fetchJson(url);
-  return data?.quoteResponse?.result || [];
+async function fetchText(url){
+  const res=await fetch(url,{headers:{"User-Agent":UA,"Accept":"application/json,text/plain,*/*","Accept-Language":"en-US,en;q=0.9,th;q=0.8"}});
+  const text=await res.text();
+  if(!res.ok){const e=new Error(`Upstream HTTP ${res.status}`);e.status=res.status;e.detail=text.slice(0,300);throw e}
+  return text;
 }
-
-async function chartEndpoint(symbol) {
-  const url =
-    "https://query1.finance.yahoo.com/v8/finance/chart/" +
-    encodeURIComponent(symbol) +
-    "?range=3mo&interval=1d";
-
-  const data = await fetchJson(url);
-  const result = data?.chart?.result?.[0];
-  if (!result) return null;
-
-  const meta = result.meta || {};
-  const quote = result.indicators?.quote?.[0] || {};
-  const closes = (quote.close || []).filter((v) => typeof v === "number");
-  const opens = (quote.open || []).filter((v) => typeof v === "number");
-  const highs = (quote.high || []).filter((v) => typeof v === "number");
-  const lows = (quote.low || []).filter((v) => typeof v === "number");
-  const vols = (quote.volume || []).filter((v) => typeof v === "number");
-
-  const last = (arr) => arr.length ? arr[arr.length - 1] : undefined;
-  const prev = closes.length >= 2 ? closes[closes.length - 2] : meta.previousClose;
-  const recentVols = vols.slice(-20);
-  const avgVol = recentVols.length
-    ? Math.round(recentVols.reduce((a, b) => a + b, 0) / recentVols.length)
-    : undefined;
-
-  return {
-    symbol,
-    shortName: meta.shortName || symbol,
-    longName: meta.longName || meta.shortName || symbol,
-    currency: meta.currency,
-    regularMarketPrice: meta.regularMarketPrice || last(closes),
-    regularMarketPreviousClose: meta.previousClose || prev,
-    regularMarketOpen: last(opens),
-    regularMarketDayHigh: meta.regularMarketDayHigh || last(highs),
-    regularMarketDayLow: meta.regularMarketDayLow || last(lows),
-    regularMarketVolume: meta.regularMarketVolume || last(vols),
-    averageDailyVolume10Day: avgVol,
-    averageDailyVolume3Month: avgVol,
-    marketState: meta.marketState || "CHART_FALLBACK"
+async function fetchJson(url){
+  const text=await fetchText(url);
+  try{return JSON.parse(text)}catch{const e=new Error("Upstream returned non-JSON");e.detail=text.slice(0,300);throw e}
+}
+async function quoteEndpoint(symbols){
+  const url="https://query1.finance.yahoo.com/v7/finance/quote?symbols="+encodeURIComponent(symbols.join(","));
+  const data=await fetchJson(url);
+  return data?.quoteResponse?.result||[];
+}
+async function chartEndpoint(symbol, withIndicators=true){
+  const url="https://query1.finance.yahoo.com/v8/finance/chart/"+encodeURIComponent(symbol)+"?range=6mo&interval=1d";
+  const data=await fetchJson(url);
+  const result=data?.chart?.result?.[0]; if(!result)return null;
+  const meta=result.meta||{}, q=result.indicators?.quote?.[0]||{};
+  const closes=(q.close||[]).filter(v=>typeof v==="number"), opens=(q.open||[]).filter(v=>typeof v==="number"), highs=(q.high||[]).filter(v=>typeof v==="number"), lows=(q.low||[]).filter(v=>typeof v==="number"), vols=(q.volume||[]).filter(v=>typeof v==="number");
+  const last=arr=>arr.length?arr[arr.length-1]:undefined;
+  const recentVols=vols.slice(-20);
+  const base={symbol,shortName:meta.shortName||symbol,longName:meta.longName||meta.shortName||symbol,currency:meta.currency,regularMarketPrice:meta.regularMarketPrice||last(closes),regularMarketPreviousClose:meta.previousClose||(closes.length>=2?closes[closes.length-2]:undefined),regularMarketOpen:last(opens),regularMarketDayHigh:meta.regularMarketDayHigh||last(highs),regularMarketDayLow:meta.regularMarketDayLow||last(lows),regularMarketVolume:meta.regularMarketVolume||last(vols),averageDailyVolume10Day:avg(vols.slice(-10)),averageDailyVolume3Month:avg(recentVols),marketState:meta.marketState||"CHART_FALLBACK"};
+  if(withIndicators){
+    base.deep=true;
+    base.indicators={rsi14:rsi(closes,14),sma5:sma(closes,5),sma20:sma(closes,20),sma50:sma(closes,50),atr14:atr(highs,lows,closes,14),high20:high(highs,20),low20:low(lows,20)};
+  }
+  return base;
+}
+function extractFundamentals(symbol, data){
+  const result=data?.quoteSummary?.result?.[0];
+  if(!result)return null;
+  const fd=result.financialData||{}, ks=result.defaultKeyStatistics||{}, sd=result.summaryDetail||{}, ap=result.assetProfile||{};
+  const fund={
+    hasFundamentals:true,
+    sector:ap.sector,
+    industry:ap.industry,
+    targetMeanPrice:raw(fd.targetMeanPrice),
+    returnOnEquity:raw(fd.returnOnEquity),
+    profitMargins:raw(fd.profitMargins)||raw(ks.profitMargins),
+    revenueGrowth:raw(fd.revenueGrowth),
+    earningsGrowth:raw(fd.earningsGrowth),
+    debtToEquity:raw(fd.debtToEquity),
+    dividendYield:raw(sd.dividendYield),
+    trailingPE:raw(sd.trailingPE)||raw(ks.trailingPE),
+    forwardPE:raw(ks.forwardPE),
+    priceToBook:raw(ks.priceToBook),
+    marketCap:raw(sd.marketCap)||raw(ks.marketCap),
+    beta:raw(ks.beta)||raw(sd.beta)
   };
+  const hasAny=Object.keys(fund).some(k=>k!=="hasFundamentals"&&fund[k]!=null);
+  return hasAny?fund:null;
 }
+async function fundamentalsEndpoint(symbol){
+  const modules=[
+    "financialData",
+    "defaultKeyStatistics",
+    "summaryDetail",
+    "assetProfile"
+  ].join(",");
+  const urls=[
+    "https://query1.finance.yahoo.com/v10/finance/quoteSummary/"+encodeURIComponent(symbol)+"?modules="+modules,
+    "https://query2.finance.yahoo.com/v10/finance/quoteSummary/"+encodeURIComponent(symbol)+"?modules="+modules
+  ];
+  let lastErr;
+  for(const url of urls){
+    try{
+      const data=await fetchJson(url);
+      const fund=extractFundamentals(symbol,data);
+      if(fund)return fund;
+    }catch(e){lastErr=e}
+  }
+  if(lastErr)throw lastErr;
+  return null;
+}
+exports.handler=async(event)=>{
+  try{
+    const rawSymbols=event.queryStringParameters?.symbols||"";
+    const deepLimit=Math.max(10, Math.min(90, Number(event.queryStringParameters?.deepLimit||70)));
+    const fundLimit=Math.max(0, Math.min(60, Number(event.queryStringParameters?.fundLimit||45)));
+    const symbols=[...new Set(rawSymbols.split(",").map(s=>s.trim().toUpperCase()).filter(Boolean))].slice(0,220);
+    if(!symbols.length)return{statusCode:400,headers:HEADERS,body:JSON.stringify({ok:false,error:"No symbols provided"})};
 
-exports.handler = async (event) => {
-  const headers = BASE_HEADERS;
-
-  try {
-    const raw = event.queryStringParameters?.symbols || "";
-    const symbols = [...new Set(raw
-      .split(",")
-      .map((s) => s.trim().toUpperCase())
-      .filter(Boolean))]
-      .slice(0, 220);
-
-    if (!symbols.length) {
-      return { statusCode: 400, headers, body: JSON.stringify({ ok: false, error: "No symbols provided" }) };
+    let quotes=[],errors=[];
+    for(const group of chunk(symbols,45)){
+      try{quotes.push(...await quoteEndpoint(group))}
+      catch(e){errors.push({stage:"quote",group:group.join(","),message:e.message,status:e.status||null,detail:e.detail||""})}
     }
 
-    let quotes = [];
-    const errors = [];
-
-    // Quote endpoint in batches to avoid huge URLs and reduce blocking.
-    for (const group of chunk(symbols, 45)) {
-      try {
-        const q = await quoteEndpoint(group);
-        quotes.push(...q);
-      } catch (e) {
-        errors.push({ stage: "quote", group: group.join(","), message: e.message, status: e.status || null, detail: e.detail || "" });
+    const got=new Set(quotes.map(q=>String(q.symbol||"").toUpperCase()));
+    const missing=symbols.filter(s=>!got.has(s));
+    for(const group of chunk(missing.slice(0,100),10)){
+      const results=await Promise.allSettled(group.map(symbol=>chartEndpoint(symbol,false)));
+      for(let i=0;i<results.length;i++){
+        const r=results[i],symbol=group[i];
+        if(r.status==="fulfilled"&&r.value&&r.value.regularMarketPrice)quotes.push(r.value);
+        else errors.push({stage:"chart-fallback",symbol,message:r.status==="rejected"?r.reason.message:"No chart data"});
       }
     }
 
-    const got = new Set((quotes || []).map((q) => String(q.symbol || "").toUpperCase()));
-    const missing = symbols.filter((s) => !got.has(s));
+    const bySymbol={}; for(const q of quotes){if(q&&q.symbol)bySymbol[String(q.symbol).toUpperCase()]=q}
+    quotes=Object.values(bySymbol);
 
-    // Fallback chart endpoint, but cap to avoid timeout. Prioritize first 80 missing.
-    const fallbackTargets = missing.slice(0, 80);
-    for (const group of chunk(fallbackTargets, 8)) {
-      const results = await Promise.allSettled(group.map((symbol) => chartEndpoint(symbol)));
-      for (let i = 0; i < results.length; i++) {
-        const r = results[i];
-        const symbol = group[i];
-        if (r.status === "fulfilled" && r.value && r.value.regularMarketPrice) {
-          quotes.push(r.value);
-        } else {
-          errors.push({
-            stage: "chart",
-            symbol,
-            message: r.status === "rejected" ? r.reason.message : "No chart data",
-            status: r.status === "rejected" ? (r.reason.status || null) : null,
-            detail: r.status === "rejected" ? (r.reason.detail || "") : ""
-          });
+    const deepSymbols=quotes.map(q=>{
+      const symbol=String(q.symbol).toUpperCase(), price=Number(q.regularMarketPrice||0), vol=Number(q.regularMarketVolume||0), avgVol=Number(q.averageDailyVolume3Month||q.averageDailyVolume10Day||0), prev=Number(q.regularMarketPreviousClose||q.regularMarketOpen||0);
+      const change=prev>0?(price-prev)/prev*100:0, volSpike=avgVol>0?vol/avgVol:0;
+      const isGold=["GC=F","GLD","IAU","SGOL","PHYS","GDX","GDXJ","NEM","GOLD","AEM","KGC","FNV","WPM","RGLD","AU","SIL","SLV"].includes(symbol);
+      const score=Math.abs(change)*8+volSpike*20+(price*vol>0?10:0)+(isGold?100:0);
+      return {symbol,score};
+    }).sort((a,b)=>b.score-a.score).slice(0,deepLimit).map(x=>x.symbol);
+
+    const deepResults=[];
+    for(const group of chunk(deepSymbols,8)){
+      const results=await Promise.allSettled(group.map(symbol=>chartEndpoint(symbol,true)));
+      for(let i=0;i<results.length;i++){
+        const r=results[i],symbol=group[i];
+        if(r.status==="fulfilled"&&r.value&&r.value.regularMarketPrice)deepResults.push(r.value);
+        else errors.push({stage:"chart-deep",symbol,message:r.status==="rejected"?r.reason.message:"No deep chart data"});
+      }
+    }
+    for(const q of deepResults){if(q&&q.symbol)bySymbol[String(q.symbol).toUpperCase()]=q}
+    quotes=Object.values(bySymbol);
+
+    const fundSymbols=quotes.map(q=>{
+      const symbol=String(q.symbol).toUpperCase();
+      const price=Number(q.regularMarketPrice||0), vol=Number(q.regularMarketVolume||0);
+      const isEtfOrGold=["GC=F","GLD","IAU","SGOL","PHYS","SPY","QQQ","DIA","IWM","XLK","XLF","XLE","XLV","XLY","XLP","TLT","HYG"].includes(symbol);
+      const score=(price*vol>0?Math.log10(price*vol+1):0)+(isEtfOrGold?-100:0);
+      return {symbol,score};
+    }).sort((a,b)=>b.score-a.score).slice(0,fundLimit).map(x=>x.symbol);
+
+    let fundCount=0;
+    for(const group of chunk(fundSymbols,6)){
+      const results=await Promise.allSettled(group.map(symbol=>fundamentalsEndpoint(symbol)));
+      for(let i=0;i<results.length;i++){
+        const r=results[i],symbol=group[i];
+        if(r.status==="fulfilled"&&r.value&&bySymbol[symbol]){
+          bySymbol[symbol].fundamentals=r.value;
+          fundCount++;
+        }else if(r.status==="rejected"){
+          errors.push({stage:"fundamentals",symbol,message:r.reason.message,status:r.reason.status||null,detail:r.reason.detail||""});
         }
       }
     }
 
-    // Deduplicate.
-    const bySymbol = {};
-    for (const q of quotes) {
-      if (q && q.symbol) bySymbol[String(q.symbol).toUpperCase()] = q;
-    }
-    quotes = Object.values(bySymbol);
-
-    return {
-      statusCode: 200,
-      headers,
-      body: JSON.stringify({
-        ok: true,
-        source: "Yahoo Finance quote batches + chart fallback",
-        requested: symbols.length,
-        count: quotes.length,
-        quotes,
-        errors: errors.slice(0, 30)
-      })
-    };
-  } catch (err) {
-    return {
-      statusCode: 200,
-      headers,
-      body: JSON.stringify({ ok: false, error: err.message || "Function failed", quotes: [] })
-    };
+    quotes=Object.values(bySymbol);
+    const returned=new Set(quotes.map(q=>String(q.symbol||"").toUpperCase()));
+    return{statusCode:200,headers:HEADERS,body:JSON.stringify({ok:true,source:"Yahoo quote + chart indicators + fundamentals V8",requested:symbols.length,count:quotes.length,deepCount:deepResults.length,fundCount,quotes,missing:symbols.filter(s=>!returned.has(s)),errors:errors.slice(0,60)})}
+  }catch(err){
+    return{statusCode:200,headers:HEADERS,body:JSON.stringify({ok:false,error:err.message||"Function failed",quotes:[]})}
   }
 };
