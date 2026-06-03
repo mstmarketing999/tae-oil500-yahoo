@@ -1,10 +1,9 @@
-const yahooFinance = require("yahoo-finance2").default;
-
 exports.handler = async (event) => {
   const headers = {
     "Access-Control-Allow-Origin": "*",
     "Access-Control-Allow-Headers": "Content-Type",
-    "Content-Type": "application/json; charset=utf-8"
+    "Content-Type": "application/json; charset=utf-8",
+    "Cache-Control": "public, max-age=60"
   };
 
   try {
@@ -16,35 +15,63 @@ exports.handler = async (event) => {
       .slice(0, 50);
 
     if (!symbols.length) {
-      return { statusCode: 400, headers, body: JSON.stringify({ ok: false, error: "No symbols provided" }) };
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({ ok: false, error: "No symbols provided" })
+      };
     }
 
-    const result = await yahooFinance.quote(symbols, {
-      fields: [
-        "symbol",
-        "shortName",
-        "longName",
-        "currency",
-        "regularMarketPrice",
-        "regularMarketPreviousClose",
-        "regularMarketOpen",
-        "regularMarketDayHigh",
-        "regularMarketDayLow",
-        "regularMarketVolume",
-        "averageDailyVolume10Day",
-        "averageDailyVolume3Month",
-        "marketState"
-      ]
+    const yahooUrl =
+      "https://query1.finance.yahoo.com/v7/finance/quote?symbols=" +
+      encodeURIComponent(symbols.join(","));
+
+    const response = await fetch(yahooUrl, {
+      headers: {
+        "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36",
+        "Accept": "application/json,text/plain,*/*"
+      }
     });
 
-    const quotes = Array.isArray(result) ? result : [result];
+    const text = await response.text();
+
+    if (!response.ok) {
+      return {
+        statusCode: 502,
+        headers,
+        body: JSON.stringify({
+          ok: false,
+          error: "Yahoo upstream HTTP " + response.status,
+          detail: text.slice(0, 500)
+        })
+      };
+    }
+
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch (e) {
+      return {
+        statusCode: 502,
+        headers,
+        body: JSON.stringify({
+          ok: false,
+          error: "Yahoo returned non-JSON response",
+          detail: text.slice(0, 500)
+        })
+      };
+    }
+
+    const quotes = data?.quoteResponse?.result || [];
 
     return {
       statusCode: 200,
       headers,
       body: JSON.stringify({
         ok: true,
-        source: "Yahoo Finance via yahoo-finance2",
+        source: "Yahoo Finance query1 quote endpoint via Netlify Function",
+        requested: symbols.length,
         count: quotes.length,
         quotes
       })
@@ -55,7 +82,7 @@ exports.handler = async (event) => {
       headers,
       body: JSON.stringify({
         ok: false,
-        error: err.message || "Yahoo Finance function failed"
+        error: err.message || "Function failed"
       })
     };
   }

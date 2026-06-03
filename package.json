@@ -1,14 +1,10 @@
 {
-  "name": "tae-oil500-yahoo",
-  "version": "1.0.0",
-  "description": "Tae&oil500 stock scanner using Yahoo Finance via Netlify Functions",
+  "name": "tae-oil500-yahoo-fetch",
+  "version": "1.1.0",
+  "description": "Tae&oil500 stock scanner using Yahoo Finance through native fetch in Netlify Functions",
   "main": "index.html",
   "scripts": {
-    "dev": "netlify dev",
     "build": "echo \"Static site - no build step\""
   },
-  "dependencies": {
-    "yahoo-finance2": "^2.13.3"
-  },
-  "devDependencies": {}
+  "dependencies": {}
 }

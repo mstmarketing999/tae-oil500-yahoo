@@ -1,38 +1,33 @@
-# Tae&oil500 Yahoo Scanner
+# Tae&oil500 Yahoo Scanner - Fetch Version
 
-เว็บนี้ใช้ Netlify Function เป็นตัวกลางดึงข้อมูลจาก Yahoo Finance ผ่าน package `yahoo-finance2`
+เวอร์ชันนี้ไม่ใช้ package `yahoo-finance2` แล้ว  
+Netlify Function ใช้ native `fetch` เรียก Yahoo Finance quote endpoint โดยตรงจากฝั่ง server
 
-## โครงสร้างไฟล์
+## ไฟล์สำคัญ
 
-- `index.html` เว็บหลัก
-- `netlify/functions/yahoo.js` ตัวกลางดึง Yahoo Finance
-- `netlify.toml` ตั้งค่า Netlify
-- `package.json` dependency
+- `index.html`
+- `netlify.toml`
+- `package.json`
+- `netlify/functions/yahoo.js`
 
-## วิธี Deploy บน Netlify แบบง่าย
+## วิธีอัปเดต GitHub
 
-1. แตก ZIP
-2. เอาโฟลเดอร์ทั้งหมดขึ้น GitHub หรือ Deploy ผ่าน Netlify
-3. Netlify จะติดตั้ง dependency จาก `package.json`
-4. เปิดเว็บ แล้วกด `ดึง Yahoo + สแกน`
+ให้อัปโหลดไฟล์ทั้งหมดนี้ไปไว้หน้าแรกของ repo:
 
-## Ticker ตัวอย่าง
+- index.html
+- netlify.toml
+- package.json
+- README.md
+- netlify/functions/yahoo.js
 
-หุ้นสหรัฐ:
-- MSFT
-- NVDA
-- AAPL
-- TSLA
-- SPY
-- QQQ
+จากนั้นกลับไป Netlify แล้วกด:
 
-หุ้นไทย:
-- PTT.BK
-- CPALL.BK
-- AOT.BK
-- ADVANC.BK
+Deploys → Trigger deploy → Clear cache and deploy site
 
-## ข้อจำกัด
+## Test Function
 
-Yahoo Finance ไม่ใช่ official paid market data API สำหรับระบบเทรดจริง อาจมี delay, เปลี่ยน endpoint, หรือบาง ticker ดึงไม่ได้ในบางช่วง
-เว็บนี้เหมาะกับ MVP / screening เบื้องต้น ไม่ใช่คำสั่งซื้อขายอัตโนมัติ
+หลัง deploy เสร็จ ลองเปิด:
+
+`https://YOUR-SITE.netlify.app/.netlify/functions/yahoo?symbols=MSFT,NVDA,PTT.BK`
+
+ถ้าถูกต้องต้องได้ JSON ไม่ใช่ 404/502
