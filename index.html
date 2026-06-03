@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>Tae&oil500 V8 Fundamental Upgrade</title>
+  <title>Tae&oil500</title>
   <meta name="theme-color" content="#07111f" />
   <style>
     :root{
@@ -33,7 +33,7 @@
     .panelHead{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:12px}.panel h2{font-size:18px;margin:0 0 4px}.panel p{margin:0;color:var(--muted);line-height:1.48;font-size:13px}
     .btns{display:flex;flex-wrap:wrap;gap:8px}.btn{border-radius:14px;padding:10px 12px;font-weight:800;color:var(--text);background:rgba(255,255,255,.075);border:1px solid rgba(255,255,255,.11)}
     .btn.primary{background:linear-gradient(135deg,var(--gold),#f59e0b);color:#08111f}.btn.small{font-size:12px;padding:8px 10px;border-radius:12px}.btn.red{background:rgba(239,68,68,.15);border-color:rgba(239,68,68,.32);color:#fecaca}.btn.blue{background:rgba(100,166,255,.15);border-color:rgba(100,166,255,.32);color:#dbeafe}.btn.green{background:rgba(34,197,94,.14);border-color:rgba(34,197,94,.28);color:#bbf7d0}
-    .summaryGrid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}.summaryCard{border-radius:16px;background:rgba(2,8,23,.34);border:1px solid rgba(255,255,255,.07);padding:10px}.summaryCard small{display:block;color:var(--muted);font-size:11px}.summaryCard b{font-size:19px;margin-top:2px;display:block}
+    .summaryGrid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px}.summaryCard{border-radius:16px;background:rgba(2,8,23,.34);border:1px solid rgba(255,255,255,.07);padding:10px}.summaryCard small{display:block;color:var(--muted);font-size:11px}.summaryCard b{font-size:19px;margin-top:2px;display:block}
     .empty{min-height:160px;border-radius:20px;border:1px dashed rgba(255,255,255,.15);display:grid;place-items:center;text-align:center;padding:22px;background:rgba(2,8,23,.28)}.zero{font-size:58px;font-weight:950;line-height:1;color:rgba(255,255,255,.28)}.empty b{display:block;margin-top:8px;font-size:18px}.empty span{display:block;color:var(--muted);margin-top:5px;font-size:13px;line-height:1.45}
     .list{display:grid;gap:10px}.stock{border:1px solid rgba(255,255,255,.09);border-radius:20px;background:rgba(255,255,255,.052);padding:13px}.stockTop{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}.sym{font-size:20px;font-weight:950}.name{font-size:12px;color:var(--muted);margin-top:2px}
     .score{min-width:58px;height:40px;border-radius:14px;display:grid;place-items:center;font-weight:950;background:rgba(34,197,94,.13);color:#bbf7d0;border:1px solid rgba(34,197,94,.28)}.score.hot{background:rgba(251,146,60,.13);color:#fed7aa;border-color:rgba(251,146,60,.32)}.score.watch{background:rgba(100,166,255,.12);color:#dbeafe;border-color:rgba(100,166,255,.28)}
@@ -57,7 +57,7 @@
           <div class="mark">T&O</div>
           <div>
             <h1>Tae&oil500</h1>
-            <div class="sub">V8 Fundamental Upgrade • Yahoo price/chart/fundamentals</div>
+            <div class="sub">ระบบกันเหนียว • ข้อมูลสด/ข้อมูลสำรอง</div>
           </div>
         </div>
         <div class="sync"><span class="dot"></span><span id="syncText">พร้อม</span></div>
@@ -65,83 +65,85 @@
     </header>
 
     <section class="hero">
-      <h2 id="dailyTitle">วันนี้มีสัญญาณ A+ ไหม?</h2>
-      <p id="dailyNote">V8 เพิ่ม fundamentals ฟรีจาก Yahoo: PE, PB, ROE, Margin, Debt, Growth, Dividend เพื่อให้ TAE VI ฉลาดขึ้น</p>
+      <h2 id="dailyTitle">วันนี้มีตัวไหนน่าสนใจไหม?</h2>
+      <p id="dailyNote">ระบบจะเช็กราคา ปริมาณซื้อขาย กราฟย้อนหลัง และข้อมูลพื้นฐานเท่าที่หาได้ฟรี แล้วสรุปให้แบบง่าย ๆ</p>
       <div class="progressLine"><i id="scanProgressBar"></i></div>
     </section>
 
     <section class="tabs">
       <button class="tab active" id="taeTab" onclick="setSide('tae')">
         <b>TAE VI <span class="count" id="taeCount">0</span></b>
-        <span>A+ = Buy Zone / B = พื้นฐานดีแต่ยังไม่ใช่จุดซื้อชัด</span>
+        <span>ตัวน่าซื้อ = เข้าเกณฑ์มาก / ตัวน่าจับตา = รอดูอีกนิด</span>
       </button>
       <button class="tab" id="oilTab" onclick="setSide('oil')">
         <b>Oil หุ้นซิ่ง <span class="count" id="oilCount">0</span></b>
-        <span>A+ = เล่นได้ตามแผน / B = รอยืนยัน ห้ามไล่ราคา</span>
+        <span>ตัวน่าเล่น = สัญญาณค่อนข้างครบ / ตัวน่าจับตา = ยังไม่ควรรีบไล่ราคา</span>
       </button>
     </section>
 
     <section class="panel">
       <div class="panelHead">
-        <div><h2>สรุปการสแกน</h2><p>ดึงข้อมูลกว้าง + วิเคราะห์กราฟลึก + ดึงพื้นฐานเฉพาะตัวที่มีโอกาส</p></div>
-        <div class="btns"><button class="btn small blue" onclick="refreshAndScan()">สแกน V8</button></div>
+        <div><h2>สรุปวันนี้</h2><p>ระบบเช็กหุ้นหลายตัว แล้วโชว์เฉพาะตัวที่พอมีเหตุผล ไม่ยัดรายการมั่ว</p></div>
+        <div class="btns"><button class="btn small blue" onclick="refreshAndScan()">สแกนใหม่</button></div>
       </div>
       <div class="summaryGrid">
-        <div class="summaryCard"><small>Universe</small><b id="sumUniverse">-</b></div>
+        <div class="summaryCard"><small>ชุดที่สแกน</small><b id="sumชุดที่สแกน">-</b></div>
         <div class="summaryCard"><small>ดึงได้</small><b id="sumFetched">0/0</b></div>
-        <div class="summaryCard"><small>A+</small><b id="sumAplus">0</b></div>
-        <div class="summaryCard"><small>B Watch</small><b id="sumB">0</b></div>
-        <div class="summaryCard"><small>กราฟลึก</small><b id="sumDeep">0</b></div>
-        <div class="summaryCard"><small>พื้นฐาน</small><b id="sumFund">0</b></div>
+        <div class="summaryCard"><small>น่าซื้อ</small><b id="sumAplus">0</b></div>
+        <div class="summaryCard"><small>น่าจับตา</small><b id="sumB">0</b></div>
+        <div class="summaryCard"><small>เช็กกราฟ</small><b id="sumDeep">0</b></div>
+        <div class="summaryCard"><small>ข้อมูลพื้นฐาน</small><b id="sumFund">0</b></div>
+        <div class="summaryCard"><small>สถานะข้อมูล</small><b id="sumHealth">-</b></div>
       </div>
       <div id="missingWrap" class="hide" style="margin-top:10px">
-        <div class="mini" style="margin-bottom:5px">Ticker ที่ดึงไม่ได้ / Yahoo ไม่ส่งข้อมูลกลับมา</div>
+        <div class="mini" style="margin-bottom:5px">ตัวที่ดึงข้อมูลไม่ได้</div>
         <div id="missingBox" class="missingBox"></div>
       </div>
+      <div id="healthBox" class="warn" style="margin-top:10px">สถานะข้อมูล: ยังไม่ได้สแกน</div>
     </section>
 
     <section class="panel">
       <div class="panelHead">
-        <div><h2 id="sideTitle">TAE VI — Buy Zone / Watch</h2><p id="sideDesc">แสดงเฉพาะตัวที่ผ่านขั้นต่ำ ถ้าไม่ดีพอขึ้น 0</p></div>
+        <div><h2 id="sideTitle">TAE VI — ตัวน่าซื้อ / น่าจับตา</h2><p id="sideDesc">ถ้าไม่มีตัวที่ดีพอ ระบบจะขึ้น 0 ไม่ฝืนแนะนำ</p></div>
       </div>
       <div id="resultList"></div>
     </section>
 
     <section class="panel">
-      <div class="panelHead"><div><h2>กฎตัดสินใจ V8</h2><p>TAE ใช้ fundamentals เท่าที่ฟรีหาได้ ส่วน Oil ใช้กราฟย้อนหลังและ Risk/Reward</p></div></div>
-      <div class="warn">ข้อมูลฟรีอาจไม่ครบ โดยเฉพาะหุ้นไทยบางตัว ถ้า Yahoo ไม่มีพื้นฐาน ระบบจะใช้ข้อมูลหลังบ้านเดิมเป็น fallback และขึ้น tag “manual/fallback” แทนการมั่วว่าเป็นข้อมูลครบ</div>
+      <div class="panelHead"><div><h2>กฎตัดสินใจ</h2><p>แอพนี้ช่วยคัดเบื้องต้นเท่านั้น ก่อนซื้อจริงต้องเปิด Streaming/Dime ดูซ้ำ</p></div></div>
+      <div class="warn">ข้อมูลฟรีอาจไม่ครบ โดยเฉพาะหุ้นไทยบางตัว ถ้าข้อมูลไม่พอ ระบบจะใช้ข้อมูลสำรองและลดความมั่นใจ ไม่แกล้งทำเหมือนข้อมูลครบ</div>
     </section>
 
     <section class="panel hide" id="settingsPanel">
       <div class="panelHead">
-        <div><h2>ตั้งค่า</h2><p>ซ่อน JSON แล้ว เหลือเฉพาะสิ่งที่ควรปรับจริง</p></div>
+        <div><h2>ตั้งค่า</h2><p>เหลือเฉพาะค่าที่ควรปรับจริง ไม่ต้องแตะโค้ด</p></div>
         <button class="btn primary" onclick="saveSettings()">บันทึก</button>
       </div>
       <div class="formgrid">
         <div><label>เงินทุนอ้างอิง</label><input id="capital" type="number"></div>
         <div><label>ขาดทุนสูงสุดต่อดีล</label><input id="maxLoss" type="number"></div>
-        <div><label>TAE A+ เกณฑ์ขั้นต่ำ</label><input id="taeMin" type="number"></div>
-        <div><label>Oil A+ เกณฑ์ขั้นต่ำ</label><input id="oilMin" type="number"></div>
-        <div><label>มูลค่าซื้อขายขั้นต่ำ / ตัว</label><input id="minTurnover" type="number"></div>
-        <div><label>Risk/Reward ขั้นต่ำ</label><input id="minRR" type="number" step="0.1"></div>
-        <div><label>Universe ปัจจุบัน</label><select id="universeSelect" onchange="setUniverse(this.value)"><option value="watchlist">Watchlist</option><option value="thai">หุ้นไทยหลัก</option><option value="us">หุ้นสหรัฐหลัก</option><option value="gold">ทองคำ/เหมืองทอง</option><option value="all">All Core</option></select></div>
-        <div><label>จำนวนตัวที่ดึงกราฟลึกสูงสุด</label><input id="deepLimit" type="number"></div>
-        <div><label>จำนวนตัวที่ดึงพื้นฐานสูงสุด</label><input id="fundLimit" type="number"></div>
-        <div><label>แสดง B Watch</label><select id="showWatch"><option value="yes">แสดง A+ และ B</option><option value="no">แสดงเฉพาะ A+</option></select></div>
+        <div><label>TAE น่าซื้อ เกณฑ์ขั้นต่ำ</label><input id="taeMin" type="number"></div>
+        <div><label>Oil น่าซื้อ เกณฑ์ขั้นต่ำ</label><input id="oilMin" type="number"></div>
+        <div><label>มูลค่าซื้อขายขั้นต่ำ</label><input id="minมูลค่าซื้อขาย" type="number"></div>
+        <div><label>ความคุ้มขั้นต่ำ</label><input id="minความคุ้ม" type="number" step="0.1"></div>
+        <div><label>ชุดที่สแกน ปัจจุบัน</label><select id="universeSelect" onchange="setชุดที่สแกน(this.value)"><option value="watchlist">น่าจับตาlist</option><option value="thai">หุ้นไทยหลัก</option><option value="us">หุ้นสหรัฐหลัก</option><option value="gold">ทองคำ/เหมืองทอง</option><option value="all">All Core</option></select></div>
+        <div><label>จำนวนตัวที่ดึงเช็กกราฟสูงสุด</label><input id="deepLimit" type="number"></div>
+        <div><label>จำนวนตัวที่ดึงข้อมูลพื้นฐานสูงสุด</label><input id="fundLimit" type="number"></div>
+        <div><label>แสดง น่าจับตา</label><select id="showน่าจับตา"><option value="yes">แสดงตัวน่าซื้อและน่าจับตา</option><option value="no">แสดงเฉพาะ น่าซื้อ</option></select></div>
       </div>
       <div class="btns" style="margin-top:10px">
-        <button class="btn blue" onclick="setUniverse('watchlist')">Watchlist</button>
-        <button class="btn blue" onclick="setUniverse('thai')">หุ้นไทยหลัก</button>
-        <button class="btn blue" onclick="setUniverse('us')">หุ้นสหรัฐหลัก</button>
-        <button class="btn blue" onclick="setUniverse('gold')">ทองคำ/เหมืองทอง</button>
-        <button class="btn primary" onclick="setUniverse('all')">All Core</button>
+        <button class="btn blue" onclick="setชุดที่สแกน('watchlist')">น่าจับตาlist</button>
+        <button class="btn blue" onclick="setชุดที่สแกน('thai')">หุ้นไทยหลัก</button>
+        <button class="btn blue" onclick="setชุดที่สแกน('us')">หุ้นสหรัฐหลัก</button>
+        <button class="btn blue" onclick="setชุดที่สแกน('gold')">ทองคำ/เหมืองทอง</button>
+        <button class="btn primary" onclick="setชุดที่สแกน('all')">All Core</button>
       </div>
-      <div style="margin-top:10px"><label>Watchlist คั่นด้วย comma</label><textarea id="watchlist"></textarea></div>
+      <div style="margin-top:10px"><label>น่าจับตาlist คั่นด้วย comma</label><textarea id="watchlist"></textarea></div>
       <div class="btns" style="margin-top:10px">
-        <button class="btn green" onclick="refreshAndScan()">สแกน V8</button>
+        <button class="btn green" onclick="refreshAndScan()">สแกนใหม่</button>
         <button class="btn red" onclick="resetAll()">รีเซ็ตค่าในเครื่อง</button>
       </div>
-      <div class="mini" style="margin-top:10px">ถ้าอัปเวอร์ชันใหม่แล้วค่าดูแปลก ให้กด “รีเซ็ตค่าในเครื่อง” 1 ครั้ง เพราะ browser อาจจำค่าเก่าจากเวอร์ชันก่อน</div>
+      <div class="mini" style="margin-top:10px">ถ้าหน้าเว็บยังจำค่าเก่าหรือแสดงผลแปลก ให้กดรีเซ็ตค่าในเครื่อง 1 ครั้ง</div>
     </section>
   </main>
 
@@ -153,8 +155,11 @@
     </div>
   </nav>
 
+
 <script>
-const KEY='tae_oil_v8_fundamental_upgrade';
+const KEY='tae_oil_v9_multi_source_backup';
+const CACHE_KEY='tae_oil_last_good_quotes_v9';
+
 const UNIVERSES = {
   watchlist:['MSFT','NVDA','AAPL','TSLA','SPY','QQQ','PTT.BK','CPALL.BK','AOT.BK','ADVANC.BK','GLD','IAU','GDX'],
   thai:['PTT.BK','PTTEP.BK','AOT.BK','ADVANC.BK','CPALL.BK','BDMS.BK','KBANK.BK','BBL.BK','KTB.BK','SCB.BK','DELTA.BK','GULF.BK','TRUE.BK','CPN.BK','CRC.BK','HMPRO.BK','GLOBAL.BK','MINT.BK','BH.BK','BEM.BK','BTS.BK','TOP.BK','GPSC.BK','EA.BK','OR.BK','TISCO.BK','INTUCH.BK','TU.BK','SCC.BK','SCGP.BK','CBG.BK','OSP.BK','COM7.BK','KCE.BK','HANA.BK','BGRIM.BK','RATCH.BK','WHA.BK','AMATA.BK','CENTEL.BK','TIDLOR.BK','SAWAD.BK','MTC.BK','KKP.BK','AP.BK','LH.BK','SPALI.BK','ORI.BK','AWC.BK','ERW.BK','PLANB.BK','VGI.BK','DOHOME.BK','MEGA.BK','CHG.BK','BCH.BK','JMT.BK','JMART.BK','SINGER.BK','FORTH.BK'],
@@ -164,18 +169,21 @@ const UNIVERSES = {
 UNIVERSES.all=[...new Set([...UNIVERSES.thai,...UNIVERSES.us,...UNIVERSES.gold])];
 
 const DEFAULT={
-  settings:{capital:10000000,maxLoss:300000,taeMin:80,oilMin:80,minTurnover:20000000,minRR:1.5,universe:'all',watchlist:UNIVERSES.watchlist.join(','),deepLimit:70,fundLimit:45,showWatch:'yes'},
+  settings:{capital:10000000,maxLoss:300000,taeMin:80,oilMin:80,minTurnover:20000000,minRR:1.5,universe:'all',watchlist:UNIVERSES.watchlist.join(','),deepLimit:70,fundLimit:25,showWatch:'yes',maxCacheHours:24},
   manual:{
     'MSFT':{name:'Microsoft',fairValue:510,quality:94,debt:18,growth:78,dividend:42},'NVDA':{name:'NVIDIA',fairValue:122,quality:84,debt:15,growth:95,dividend:5},'AAPL':{name:'Apple',fairValue:205,quality:88,debt:24,growth:54,dividend:35},'TSLA':{name:'Tesla',fairValue:160,quality:62,debt:28,growth:66,dividend:0},'SPY':{name:'S&P 500 ETF',fairValue:615,quality:82,debt:10,growth:58,dividend:46},'QQQ':{name:'Nasdaq 100 ETF',fairValue:535,quality:84,debt:12,growth:70,dividend:25},
     'PTT.BK':{name:'PTT',fairValue:42,quality:70,debt:35,growth:45,dividend:60},'CPALL.BK':{name:'CPALL',fairValue:72,quality:78,debt:46,growth:68,dividend:32},'AOT.BK':{name:'AOT',fairValue:78,quality:80,debt:35,growth:70,dividend:20},'ADVANC.BK':{name:'ADVANC',fairValue:245,quality:86,debt:22,growth:55,dividend:70},'SCB.BK':{name:'SCB X',fairValue:150,quality:78,debt:35,growth:55,dividend:60},
     'GLD':{name:'SPDR Gold Shares',fairValue:250,quality:78,debt:5,growth:50,dividend:0},'IAU':{name:'iShares Gold Trust',fairValue:55,quality:78,debt:5,growth:50,dividend:0},'GDX':{name:'Gold Miners ETF',fairValue:42,quality:60,debt:25,growth:55,dividend:20},'GC=F':{name:'Gold Futures',fairValue:2500,quality:80,debt:0,growth:50,dividend:0}
   },
-  quotes:[],lastUpdate:null,lastRequested:0,lastUniverse:'all',missing:[],deepCount:0,fundCount:0
+  quotes:[],lastUpdate:null,lastRequested:0,lastUniverse:'all',missing:[],deepCount:0,fundCount:0,dataMode:'none',fetchError:''
 };
+
 let state=loadState(), side='tae';
 
 function loadState(){try{return JSON.parse(localStorage.getItem(KEY))||structuredClone(DEFAULT)}catch(e){return structuredClone(DEFAULT)}}
 function saveState(){localStorage.setItem(KEY,JSON.stringify(state))}
+function saveLastGood(payload){try{localStorage.setItem(CACHE_KEY,JSON.stringify(payload))}catch(e){}}
+function loadLastGood(){try{return JSON.parse(localStorage.getItem(CACHE_KEY))}catch(e){return null}}
 function fmt(n){return new Intl.NumberFormat('th-TH',{maximumFractionDigits:0}).format(Number(n||0))}
 function f2(n){return Number(n||0).toFixed(2)}
 function pct(n){return `${Number(n||0).toFixed(1)}%`}
@@ -188,6 +196,27 @@ function num(v,d=null){return typeof v==='number'&&!Number.isNaN(v)?v:d}
 function clamp(v,min,max){return Math.max(min,Math.min(max,v))}
 function scoreHigh(value, good, max){if(value==null)return 50; return clamp((value/good)*max,0,100)}
 function scoreLow(value, good, bad){if(value==null)return 50; if(value<=good)return 100; if(value>=bad)return 10; return 100-((value-good)/(bad-good))*90}
+function cacheAgeHours(){if(!state.lastUpdate)return 9999; return (Date.now()-new Date(state.lastUpdate).getTime())/36e5}
+function isStale(){return cacheAgeHours() > (state.settings.maxCacheHours||24)}
+function isVeryStale(){return cacheAgeHours() > 72}
+
+function dataConfidence(asset){
+  let c=100;
+  if(state.dataMode==='cache') c-=25;
+  if(isStale()) c-=20;
+  if(isVeryStale()) c-=30;
+  if(!asset.deep) c-=15;
+  if(!asset.hasFund && side==='tae') c-=15;
+  if(asset.source==='stooq') c-=10;
+  return clamp(Math.round(c),0,100);
+}
+function downgradeGrade(grade, confidence){
+  if(grade==='A+' && confidence<75) return 'B';
+  if(confidence<45) return '0';
+  if(isVeryStale()) return '0';
+  return grade;
+}
+
 function buildAssets(){
   const qm=quoteMap();
   return selectedSymbols().map(sym=>{
@@ -212,9 +241,11 @@ function buildAssets(){
     const debt=hasFund&&debtEq!=null?clamp(debtEq/2,0,100):Number(man.debt||(isGold(sym)?5:40));
     const growth=hasFund?Math.round(scoreHigh(revGrowth||0,0.12,50)+scoreHigh(earnGrowth||0,0.15,50)):Number(man.growth||50);
     const dividend=hasFund?Math.round(scoreHigh(divYield||0,0.04,100)):Number(man.dividend||0);
-    return {symbol:sym,name:man.name||q.shortName||q.longName||sym,price,prev,volume,avgVolume,changePct,volumeSpike,rsi,sma5,sma20,sma50,atr,high20,low20,breakout,rr,
+    const asset={symbol:sym,name:man.name||q.shortName||q.longName||sym,price,prev,volume,avgVolume,changePct,volumeSpike,rsi,sma5,sma20,sma50,atr,high20,low20,breakout,rr,
       fairValue,quality,debt,growth,dividend,support,target:side==='oil'?oilTarget:fairValue,stop,currency,turnoverTHB,note:q.marketState?`Market: ${q.marketState}`:'',
-      gold:isGold(sym),deep:!!q.deep,hasFund,roe,margin,revGrowth,earnGrowth,debtEq,divYield,pe,pb,sector:fund.sector,industry:fund.industry}
+      gold:isGold(sym),deep:!!q.deep,hasFund,roe,margin,revGrowth,earnGrowth,debtEq,divYield,pe,pb,sector:fund.sector,industry:fund.industry,source:q.source||state.dataMode||'live'};
+    asset.confidence=dataConfidence(asset);
+    return asset;
   }).filter(a=>a.price>0)
 }
 function taeScore(a){
@@ -222,8 +253,8 @@ function taeScore(a){
   return Math.round(a.quality*.22+marginScore*.20+debtScore*.13+a.growth*.10+a.dividend*.06+stability*.08+trend*.06+peScore*.07+roeScore*.05+marginReal*.03+fundBonus+goldBonus)
 }
 function oilScore(a){const volumeScore=Math.min(100,a.volumeSpike*45), breakoutScore=a.breakout?100:35, rsiScore=a.rsi>=55&&a.rsi<=72?95:a.rsi>76?35:55, trendScore=(a.price>a.sma20&&a.sma5>a.sma20)?95:(a.price>a.sma20?72:38), rrScore=Math.min(100,a.rr*45), turnoverScore=Math.min(100,a.turnoverTHB/(state.settings.minTurnover||20000000)*45), moveScore=a.changePct>0?Math.min(100,a.changePct*18):10, goldBonus=a.gold?4:0; return Math.round(volumeScore*.20+breakoutScore*.18+rsiScore*.16+trendScore*.16+rrScore*.14+turnoverScore*.10+moveScore*.06+goldBonus)}
-function gradeTae(a){const margin=((a.fairValue-a.price)/a.price)*100, score=taeScore(a); if(score>=state.settings.taeMin&&a.quality>=70&&margin>=6&&a.debt<=65&&a.turnoverTHB>=state.settings.minTurnover*.25)return 'A+'; if(score>=68&&a.quality>=62&&margin>=0&&a.debt<=75)return 'B'; return '0'}
-function gradeOil(a){const score=oilScore(a), strong=score>=state.settings.oilMin&&a.volumeSpike>=1.05&&a.price>a.sma20&&a.sma5>a.sma20&&a.rsi>=55&&a.rsi<=74&&a.rr>=state.settings.minRR&&a.turnoverTHB>=state.settings.minTurnover&&(a.breakout||a.changePct>1.2); if(strong)return 'A+'; const watch=score>=68&&a.volumeSpike>=0.75&&a.price>a.sma20&&a.rsi>=50&&a.rsi<=78&&a.rr>=1.0&&a.turnoverTHB>=state.settings.minTurnover*.5; return watch?'B':'0'}
+function gradeTae(a){const margin=((a.fairValue-a.price)/a.price)*100, score=taeScore(a); let g='0'; if(score>=state.settings.taeMin&&a.quality>=70&&margin>=6&&a.debt<=65&&a.turnoverTHB>=state.settings.minTurnover*.25)g='A+'; else if(score>=68&&a.quality>=62&&margin>=0&&a.debt<=75)g='B'; return downgradeGrade(g,a.confidence)}
+function gradeOil(a){const score=oilScore(a); let g='0'; const strong=score>=state.settings.oilMin&&a.volumeSpike>=1.05&&a.price>a.sma20&&a.sma5>a.sma20&&a.rsi>=55&&a.rsi<=74&&a.rr>=state.settings.minRR&&a.turnoverTHB>=state.settings.minTurnover&&(a.breakout||a.changePct>1.2)&&a.deep; if(strong)g='A+'; else {const watch=score>=68&&a.volumeSpike>=0.75&&a.price>a.sma20&&a.rsi>=50&&a.rsi<=78&&a.rr>=1.0&&a.turnoverTHB>=state.settings.minTurnover*.5; if(watch)g='B'} return downgradeGrade(g,a.confidence)}
 function getSignals(){
   const assets=buildAssets(), showB=state.settings.showWatch!=='no';
   const tae=assets.map(a=>({...a,score:taeScore(a),grade:gradeTae(a)})).filter(a=>a.grade==='A+'||(showB&&a.grade==='B')).sort((a,b)=>gradeRank(b.grade)-gradeRank(a.grade)||b.score-a.score);
@@ -231,50 +262,75 @@ function getSignals(){
   return {tae,oil,all:assets}
 }
 function gradeRank(g){return g==='A+'?2:g==='B'?1:0}
+
 async function refreshAndScan(){
   const syms=selectedSymbols(); syncText.textContent=`สแกน 0/${syms.length}`; setProgress(15);
   try{
-    const url='/.netlify/functions/yahoo?symbols='+encodeURIComponent(syms.join(','))+'&deepLimit='+encodeURIComponent(state.settings.deepLimit||70)+'&fundLimit='+encodeURIComponent(state.settings.fundLimit||45);
+    const url='/.netlify/functions/yahoo?symbols='+encodeURIComponent(syms.join(','))+'&deepLimit='+encodeURIComponent(state.settings.deepLimit||70)+'&fundLimit='+encodeURIComponent(state.settings.fundLimit||25);
     const res=await fetch(url); const data=await res.json().catch(()=>null);
     if(!res.ok)throw new Error((data&&data.error)?data.error:'HTTP '+res.status); if(!data||!data.ok)throw new Error((data&&data.error)||'Yahoo error');
-    state.quotes=data.quotes||[]; state.lastUpdate=new Date().toISOString(); state.lastRequested=syms.length; state.lastUniverse=state.settings.universe||'all'; state.deepCount=data.deepCount||0; state.fundCount=data.fundCount||0;
+    state.quotes=(data.quotes||[]).map(q=>({...q,source:q.source||'live'})); state.lastUpdate=new Date().toISOString(); state.lastRequested=syms.length; state.lastUniverse=state.settings.universe||'all'; state.deepCount=data.deepCount||0; state.fundCount=data.fundCount||0; state.dataMode='live'; state.fetchError='';
     const got=new Set(state.quotes.map(q=>String(q.symbol||'').toUpperCase())); state.missing=syms.filter(s=>!got.has(s));
-    saveState(); setProgress(100); syncText.textContent='อัปเดตแล้ว'; showToast(`ดึงได้ ${state.quotes.length}/${syms.length} • กราฟ ${state.deepCount} • พื้นฐาน ${state.fundCount}`);
-  }catch(e){console.error(e); syncText.textContent='ดึงไม่ได้'; showToast('ดึง Yahoo ไม่สำเร็จ: '+e.message)}
+    saveState(); saveLastGood({quotes:state.quotes,lastUpdate:state.lastUpdate,lastRequested:state.lastRequested,lastUniverse:state.lastUniverse,deepCount:state.deepCount,fundCount:state.fundCount,missing:state.missing});
+    setProgress(100); syncText.textContent='อัปเดตแล้ว'; showToast(`ดึงสดได้ ${state.quotes.length}/${syms.length} • เช็กกราฟ ${state.deepCount} • พื้นฐาน ${state.fundCount}`);
+  }catch(e){
+    console.error(e); state.fetchError=e.message||'unknown';
+    const cached=loadLastGood();
+    if(cached&&cached.quotes&&cached.quotes.length){
+      state.quotes=cached.quotes.map(q=>({...q,source:'cache'})); state.lastUpdate=cached.lastUpdate; state.lastRequested=cached.lastRequested; state.lastUniverse=cached.lastUniverse; state.deepCount=cached.deepCount||0; state.fundCount=cached.fundCount||0; state.missing=cached.missing||[]; state.dataMode='cache';
+      saveState(); setProgress(65); syncText.textContent='ใช้ข้อมูลสำรอง'; showToast('ดึงสดไม่ได้ ใช้ข้อมูลล่าสุดที่เคยดึงได้แทน');
+    }else{
+      state.dataMode='degraded'; state.quotes=[]; state.missing=syms; saveState(); syncText.textContent='ข้อมูลไม่พร้อม'; showToast('ดึงข้อมูลไม่ได้ และยังไม่มีข้อมูลสำรอง');
+    }
+  }
   render(); setTimeout(()=>syncText.textContent='พร้อม',1700)
 }
 function setProgress(v){scanProgressBar.style.width=v+'%'}
+function healthText(){
+  if(state.dataMode==='live') return isStale()?'สดแต่เก่า':'ข้อมูลสด';
+  if(state.dataMode==='cache') return isVeryStale()?'ข้อมูลสำรองเก่า':'ใช้ข้อมูลสำรอง';
+  if(state.dataMode==='degraded') return 'ข้อมูลไม่พร้อม';
+  return 'ยังไม่สแกน';
+}
+function healthMessage(){
+  if(state.dataMode==='live') return isStale()?`ใช้ข้อมูลที่ดึงได้ แต่เกิน ${state.settings.maxCacheHours} ชั่วโมงแล้ว ระบบลดความมั่นใจ`:'ข้อมูลสดพร้อมใช้เป็นตัวกรองเบื้องต้น';
+  if(state.dataMode==='cache') return `ดึงสดไม่ได้ ใช้ข้อมูลล่าสุดจากข้อมูลสำรอง อัปเดตเมื่อ ${state.lastUpdate?new Date(state.lastUpdate).toLocaleString('th-TH'):'ไม่ทราบเวลา'} สัญญาณถูกลดความมั่นใจ`;
+  if(state.dataMode==='degraded') return 'ข้อมูลสดและข้อมูลสำรองไม่พร้อม วันนี้ไม่ควรใช้เป็นสัญญาณซื้อขาย';
+  return 'ยังไม่ได้สแกนข้อมูล';
+}
 function render(){
   const s=getSignals(), syms=selectedSymbols(), list=side==='tae'?s.tae:s.oil;
   const taeA=s.tae.filter(x=>x.grade==='A+').length, oilA=s.oil.filter(x=>x.grade==='A+').length, aPlus=taeA+oilA, bCount=s.tae.filter(x=>x.grade==='B').length+s.oil.filter(x=>x.grade==='B').length;
   taeCount.textContent=`${taeA}/${s.tae.length}`; oilCount.textContent=`${oilA}/${s.oil.length}`;
   taeTab.classList.toggle('active',side==='tae'); oilTab.classList.toggle('active',side==='oil'); navTae.classList.toggle('active',side==='tae'); navOil.classList.toggle('active',side==='oil');
-  sideTitle.textContent=side==='tae'?'TAE VI — Buy Zone / Watch':'Oil หุ้นซิ่ง — A+ / B';
-  sideDesc.textContent=side==='tae'?'ใช้ fundamentals จาก Yahoo ถ้ามี และใช้ข้อมูลหลังบ้านเป็น fallback ถ้าข้อมูลไม่ครบ':'A+ คือครบ Volume+Trend+RR / B คือรอยืนยัน ห้ามไล่ราคา';
-  dailyTitle.textContent=`วันนี้ A+: TAE ${taeA} / Oil ${oilA}`;
-  dailyNote.textContent=state.lastUpdate?`อัปเดตล่าสุด ${new Date(state.lastUpdate).toLocaleString('th-TH')} • ${state.lastUniverse} • ดึงได้ ${state.quotes.length}/${state.lastRequested||syms.length} • กราฟ ${state.deepCount||0} • พื้นฐาน ${state.fundCount||0}`:`Universe ปัจจุบัน: ${state.settings.universe||'all'} • เตรียมสแกน ${syms.length} ตัว`;
-  sumUniverse.textContent=state.settings.universe||'all'; sumFetched.textContent=`${state.quotes.length}/${state.lastRequested||syms.length}`; sumAplus.textContent=aPlus; sumB.textContent=bCount; sumDeep.textContent=state.deepCount||0; sumFund.textContent=state.fundCount||0;
+  sideTitle.textContent=side==='tae'?'TAE VI — ตัวน่าซื้อ / น่าจับตา':'Oil หุ้นซิ่ง — ตัวน่าซื้อ / น่าจับตา';
+  sideDesc.textContent=side==='tae'?'ถ้าข้อมูลไม่สดหรือใช้ cache ระบบจะลดระดับ ไม่ให้ขึ้นน่าซื้อง่าย':'ตัวน่าเล่นต้องมีข้อมูลสด กราฟละเอียด และแผนคุ้มพอ';
+  dailyTitle.textContent=`วันนี้ตัวน่าซื้อ: TAE ${taeA} / Oil ${oilA}`;
+  dailyNote.textContent=state.lastUpdate?`อัปเดตล่าสุด ${new Date(state.lastUpdate).toLocaleString('th-TH')} • ${state.lastUniverse} • ดึงได้ ${state.quotes.length}/${state.lastRequested||syms.length} • สถานะ: ${healthText()}`:`ชุดสแกนปัจจุบัน: ${state.settings.universe||'all'} • เตรียมสแกน ${syms.length} ตัว`;
+  sumUniverse.textContent=state.settings.universe||'all'; sumFetched.textContent=`${state.quotes.length}/${state.lastRequested||syms.length}`; sumAplus.textContent=aPlus; sumB.textContent=bCount; sumDeep.textContent=state.deepCount||0; sumFund.textContent=state.fundCount||0; sumHealth.textContent=healthText();
+  healthBox.textContent='สถานะข้อมูล: '+healthMessage();
   missingWrap.classList.toggle('hide',!(state.missing&&state.missing.length)); missingBox.textContent=(state.missing||[]).join(', ');
   resultList.innerHTML=list.length?`<div class="list">${list.map(card).join('')}</div>`:emptyHtml();
-  capital.value=state.settings.capital; maxLoss.value=state.settings.maxLoss; taeMin.value=state.settings.taeMin; oilMin.value=state.settings.oilMin; minTurnover.value=state.settings.minTurnover; minRR.value=state.settings.minRR; deepLimit.value=state.settings.deepLimit; fundLimit.value=state.settings.fundLimit; universeSelect.value=state.settings.universe||'all'; watchlist.value=state.settings.watchlist; showWatch.value=state.settings.showWatch||'yes';
+  capital.value=state.settings.capital; maxLoss.value=state.settings.maxLoss; taeMin.value=state.settings.taeMin; oilMin.value=state.settings.oilMin; minTurnover.value=state.settings.minTurnover; minRR.value=state.settings.minRR; deepLimit.value=state.settings.deepLimit; fundLimit.value=state.settings.fundLimit; universeSelect.value=state.settings.universe||'all'; watchlist.value=state.settings.watchlist; showWatch.value=state.settings.showWatch||'yes'; maxCacheHours.value=state.settings.maxCacheHours||24;
 }
-function emptyHtml(){return `<div class="empty"><div><div class="zero">0</div><b>วันนี้ไม่มีสัญญาณที่ควรยุ่ง</b><span>${side==='tae'?'ถ้าไม่มี Buy Zone ให้ถือเงินสดและรอราคา':'ถ้าไม่มี A+ หรือ B ที่ชัด อย่าเดาหุ้นซิ่ง'}</span></div></div>`}
+function emptyHtml(){return `<div class="empty"><div><div class="zero">0</div><b>วันนี้ไม่มีตัวที่ควรยุ่ง</b><span>${state.dataMode==='degraded'?'ข้อมูลไม่พร้อม ระบบจึงไม่ให้สัญญาณ':'ถ้าไม่มีตัวที่ดีพอ ให้ถือเงินสด ไม่ต้องฝืนซื้อ'}</span></div></div>`}
 function card(a){
   const margin=((a.fairValue-a.price)/a.price)*100, riskPerShare=Math.max(0.01,a.price-a.stop), qty=Math.floor(state.settings.maxLoss/riskPerShare), moneyNeed=qty*a.price, hot=side==='oil';
-  const fundText=a.hasFund?`PE ${a.pe?f2(a.pe):'-'}, PB ${a.pb?f2(a.pb):'-'}, ROE ${a.roe!=null?pct(a.roe*100):'-'}, Margin ${a.margin!=null?pct(a.margin*100):'-'}`:'พื้นฐาน: fallback/manual';
-  const reason=hot?`V8: Vol ${a.volumeSpike.toFixed(2)}x, RSI ${f2(a.rsi)}, SMA5 ${a.sma5>a.sma20?'>':'≤'} SMA20, RR ${f2(a.rr)}, Turnover ~${fmt(a.turnoverTHB)} บาท`:`V8: ${fundText}, ส่วนต่างมูลค่า ${pct(margin)}, debt score ${f2(a.debt)}, quality ${a.quality}`;
-  return `<article class="stock"><div class="stockTop"><div><div class="sym">${a.symbol} <span class="grade ${a.grade==='A+'?'aplus':'b'}">${a.grade}</span></div><div class="name">${a.name} • ${a.currency} ${a.deep?'• deep':''} ${a.hasFund?'• fundamentals':'• fallback'}</div></div><div class="score ${a.grade==='B'?'watch':(hot?'hot':'')}">${a.score}</div></div>
-  <div class="tags"><span class="tag ${a.grade==='A+'?'green':'blue'}">${a.grade==='A+'?'A+ ตามแผน':'B รอยืนยัน'}</span><span class="tag ${hot?'green':'gold'}">${hot?'Oil':'VI'}</span><span class="tag blue">RSI ${f2(a.rsi)}</span><span class="tag">Vol ${a.volumeSpike.toFixed(2)}x</span><span class="tag purple">RR ${f2(a.rr)}</span>${a.hasFund?'<span class="tag green">fund</span>':'<span class="tag gold">fallback</span>'}${a.gold?'<span class="tag gold">ทองคำ</span>':''}</div>
-  <div class="numbers"><div class="num"><small>ราคา</small><b>${f2(a.price)}</b></div><div class="num"><small>เป้า</small><b>${f2(a.target)}</b></div><div class="num"><small>คัท</small><b>${f2(a.stop)}</b></div><div class="num"><small>ATR</small><b>${f2(a.atr)}</b></div></div>
-  <div class="reason">${reason}</div><div class="danger">ถ้ายอมเสีย ${fmt(state.settings.maxLoss)} บาท ซื้อได้ประมาณ ${fmt(qty)} หุ้น/หน่วย ใช้เงินราว ${fmt(moneyNeed)} ${a.currency}</div><div class="mini" style="margin-top:8px">${a.sector?`Sector: ${a.sector}${a.industry?' • '+a.industry:''}`:''} ${a.note||''}</div></article>`
+  const fundText=a.hasFund?`ราคา/กำไร ${a.pe?f2(a.pe):'-'}, ผลตอบแทนผู้ถือหุ้น ${a.roe!=null?pct(a.roe*100):'-'}, กำไรสุทธิ ${a.margin!=null?pct(a.margin*100):'-'}`:'ข้อมูลพื้นฐาน: ใช้ข้อมูลสำรอง';
+  const reason=hot?`วอลุ่ม ${a.volumeSpike.toFixed(2)}x, แรงซื้อ ${f2(a.rsi)}, ความคุ้ม ${f2(a.rr)}, ความมั่นใจ ${a.confidence}%`:`${fundText}, ส่วนต่างมูลค่า ${pct(margin)}, คุณภาพ ${a.quality}, ความมั่นใจ ${a.confidence}%`;
+  return `<article class="stock"><div class="stockTop"><div><div class="sym">${a.symbol} <span class="grade ${a.grade==='A+'?'aplus':'b'}">${a.grade==='A+'?'น่าซื้อ':'น่าจับตา'}</span></div><div class="name">${a.name} • ${a.currency} • ${a.source==='cache'?'ข้อมูลสำรอง':(a.source==='stooq'?'แหล่งสำรอง':'สด')} ${a.deep?'• เช็กละเอียด':''} ${a.hasFund?'• มีพื้นฐาน':'• ข้อมูลสำรอง'}</div></div><div class="score ${a.grade==='B'?'watch':(hot?'hot':'')}">${a.score}</div></div>
+  <div class="tags"><span class="tag ${a.grade==='A+'?'green':'blue'}">${a.grade==='A+'?'น่าซื้อตามแผน':'น่าจับตา'}</span><span class="tag ${hot?'green':'gold'}">${hot?'Oil':'VI'}</span><span class="tag blue">แรงซื้อ ${f2(a.rsi)}</span><span class="tag">วอลุ่ม ${a.volumeSpike.toFixed(2)}x</span><span class="tag purple">ความคุ้ม ${f2(a.rr)}</span><span class="tag ${a.confidence>=75?'green':(a.confidence>=50?'gold':'red')}">มั่นใจ ${a.confidence}%</span>${a.source==='cache'?'<span class="tag red">ข้อมูลสำรอง</span>':''}${a.gold?'<span class="tag gold">ทองคำ</span>':''}</div>
+  <div class="numbers"><div class="num"><small>ราคา</small><b>${f2(a.price)}</b></div><div class="num"><small>เป้า</small><b>${f2(a.target)}</b></div><div class="num"><small>คัท</small><b>${f2(a.stop)}</b></div><div class="num"><small>ระยะเหวี่ยง</small><b>${f2(a.atr)}</b></div></div>
+  <div class="reason">${reason}</div><div class="danger">ถ้ายอมเสีย ${fmt(state.settings.maxLoss)} บาท ซื้อได้ประมาณ ${fmt(qty)} หุ้น/หน่วย ใช้เงินราว ${fmt(moneyNeed)} ${a.currency}</div><div class="mini" style="margin-top:8px">${a.sector?`กลุ่มธุรกิจ: ${a.sector}${a.industry?' • '+a.industry:''}`:''} ${a.note||''}</div></article>`
 }
-function setUniverse(mode){state.settings.universe=mode; if(mode!=='watchlist')state.settings.watchlist=UNIVERSES[mode].join(','); saveState(); render(); showToast(`เลือก Universe: ${mode} (${selectedSymbols().length} ตัว)`)}
+function setUniverse(mode){state.settings.universe=mode; if(mode!=='watchlist')state.settings.watchlist=UNIVERSES[mode].join(','); saveState(); render(); showToast(`เลือกชุดสแกน: ${mode} (${selectedSymbols().length} ตัว)`)}
 function setSide(s){side=s;settingsPanel.classList.add('hide');render();window.scrollTo({top:0,behavior:'smooth'})}
 function toggleSettings(){settingsPanel.classList.toggle('hide'); if(!settingsPanel.classList.contains('hide'))setTimeout(()=>settingsPanel.scrollIntoView({behavior:'smooth'}),50)}
-function saveSettings(){state.settings={capital:+capital.value||0,maxLoss:+maxLoss.value||0,taeMin:+taeMin.value||80,oilMin:+oilMin.value||80,minTurnover:+minTurnover.value||20000000,minRR:+minRR.value||1.5,universe:universeSelect.value||state.settings.universe||'all',watchlist:watchlist.value||DEFAULT.settings.watchlist,deepLimit:+deepLimit.value||70,fundLimit:+fundLimit.value||45,showWatch:showWatch.value||'yes'}; saveState();render();showToast('บันทึกแล้ว')}
-function resetAll(){if(confirm('รีเซ็ตข้อมูลที่ browser จำไว้ทั้งหมด?')){localStorage.removeItem(KEY);location.reload()}}
-function showToast(msg){const old=document.querySelector('.toast');if(old)old.remove();const t=document.createElement('div');t.className='toast';t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),2800)}
+function saveSettings(){state.settings={capital:+capital.value||0,maxLoss:+maxLoss.value||0,taeMin:+taeMin.value||80,oilMin:+oilMin.value||80,minTurnover:+minTurnover.value||20000000,minRR:+minRR.value||1.5,universe:universeSelect.value||state.settings.universe||'all',watchlist:watchlist.value||DEFAULT.settings.watchlist,deepLimit:+deepLimit.value||70,fundLimit:+fundLimit.value||25,showWatch:showWatch.value||'yes',maxCacheHours:+maxCacheHours.value||24}; saveState();render();showToast('บันทึกแล้ว')}
+function resetAll(){if(confirm('รีเซ็ตข้อมูลที่ browser จำไว้ทั้งหมด?')){localStorage.removeItem(KEY);localStorage.removeItem(CACHE_KEY);location.reload()}}
+function showToast(msg){const old=document.querySelector('.toast');if(old)old.remove();const t=document.createElement('div');t.className='toast';t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),3000)}
 render();
 </script>
+
 </body>
 </html>

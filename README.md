@@ -1,4 +1,4 @@
-# Tae&oil500 V8 Fundamental Upgrade
+# Tae&oil500 V9.2 Audit Final
 
 รวมทุกอย่างจาก V7 และเพิ่ม Yahoo fundamentals ฟรี:
 - quote batch
@@ -23,3 +23,21 @@ Netlify → Deploys → Trigger deploy → Clear cache and deploy site
 
 ## Note
 Yahoo Finance เป็นแหล่งข้อมูลฟรี/ไม่เป็นทางการ อาจ delay หรือข้อมูลพื้นฐานไม่ครบ โดยเฉพาะหุ้นไทยบางตัว
+
+
+## V8.1 Change
+ปรับภาษา UI ให้เข้าใจง่ายสำหรับคนเล่นหุ้นไม่เป็น: ตัดคำเทคนิคเท่าที่ทำได้ เปลี่ยนปุ่ม 'สแกน V8' เป็น 'สแกนใหม่' และซ่อนศัพท์ที่ไม่จำเป็นจากหน้าใช้งาน
+
+
+## V9 Change
+เพิ่มระบบกันเหนียว: Yahoo สด → Stooq fallback สำหรับกราฟ US/ETF → cache ล่าสุดในเครื่อง → degraded mode ถ้าข้อมูลไม่พร้อม พร้อม confidence score และป้าย live/cache/stooq
+
+## V9.2 Audit Final
+- แก้ bug สำคัญ: DOCTYPE เคยเสียจากการแทนคำเทคนิค
+- ตรวจว่าไม่มีปุ่ม "สแกน V8/V7"
+- ตรวจว่าไม่มีช่อง JSON หลังบ้าน
+- ตรวจ syntax ทั้ง Netlify Function และ inline script
+- รักษาระบบกันเหนียว: ข้อมูลสด → แหล่งสำรอง → ข้อมูลสำรองล่าสุด → โหมดข้อมูลไม่พร้อม
+
+## V9.3 Patch
+แก้ id ช่องตั้งค่า deepLimit/fundLimit ที่เคยโดนแปลเป็นภาษาไทย ทำให้ปุ่มบันทึกค่าบางช่องเสี่ยงพัง
