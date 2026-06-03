@@ -1,7 +1,7 @@
 {
-  "name": "tae-oil500-v9-4-real-fix",
-  "version": "1.9.4",
-  "description": "Tae&oil500 V9.4 real fix for broken summary ids and robust DOM bindings",
+  "name": "tae-oil500-v9-6-settings-final",
+  "version": "1.9.6",
+  "description": "Tae&oil500 V9.6 final settings save fix with restored internal ids",
   "main": "index.html",
   "scripts": {
     "build": "echo \"Static site - no build step\""

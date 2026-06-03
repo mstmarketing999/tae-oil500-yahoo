@@ -124,21 +124,22 @@
         <div><label>ขาดทุนสูงสุดต่อดีล</label><input id="maxLoss" type="number"></div>
         <div><label>TAE น่าซื้อ เกณฑ์ขั้นต่ำ</label><input id="taeMin" type="number"></div>
         <div><label>Oil น่าซื้อ เกณฑ์ขั้นต่ำ</label><input id="oilMin" type="number"></div>
-        <div><label>มูลค่าซื้อขายขั้นต่ำ</label><input id="minมูลค่าซื้อขาย" type="number"></div>
-        <div><label>ความคุ้มขั้นต่ำ</label><input id="minความคุ้ม" type="number" step="0.1"></div>
-        <div><label>ชุดที่สแกน ปัจจุบัน</label><select id="universeSelect" onchange="setชุดที่สแกน(this.value)"><option value="watchlist">น่าจับตาlist</option><option value="thai">หุ้นไทยหลัก</option><option value="us">หุ้นสหรัฐหลัก</option><option value="gold">ทองคำ/เหมืองทอง</option><option value="all">All Core</option></select></div>
+        <div><label>มูลค่าซื้อขายขั้นต่ำ</label><input id="minTurnover" type="number"></div>
+        <div><label>ความคุ้มขั้นต่ำ</label><input id="minRR" type="number" step="0.1"></div>
+        <div><label>ชุดหุ้นที่ต้องการสแกน</label><select id="universeSelect" onchange="setUniverse(this.value)"><option value="watchlist">Watchlist</option><option value="thai">หุ้นไทยหลัก</option><option value="us">หุ้นสหรัฐหลัก</option><option value="gold">ทองคำ/เหมืองทอง</option><option value="all">All Core</option></select></div>
         <div><label>จำนวนตัวที่เช็กกราฟละเอียด</label><input id="deepLimit" type="number"></div>
         <div><label>จำนวนตัวที่เช็กข้อมูลพื้นฐาน</label><input id="fundLimit" type="number"></div>
-        <div><label>แสดงตัวน่าจับตา</label><select id="showWatch"><option value="yes">แสดงตัวน่าซื้อและน่าจับตา</option><option value="no">แสดงเฉพาะ น่าซื้อ</option></select></div>
+        <div><label>แสดงตัวน่าจับตา</label><select id="showWatch"><option value="yes">แสดงตัวน่าซื้อและน่าจับตา</option><option value="no">แสดงเฉพาะตัวน่าซื้อ</option></select></div>
+        <div><label>ข้อมูลสำรองเก่าได้ไม่เกินกี่ชั่วโมง</label><input id="maxCacheHours" type="number"><div class="mini">แนะนำ 24 ชั่วโมง ถ้าเก่ากว่านี้ระบบจะลดความมั่นใจ</div></div>
       </div>
       <div class="btns" style="margin-top:10px">
-        <button class="btn blue" onclick="setชุดที่สแกน('watchlist')">น่าจับตาlist</button>
-        <button class="btn blue" onclick="setชุดที่สแกน('thai')">หุ้นไทยหลัก</button>
-        <button class="btn blue" onclick="setชุดที่สแกน('us')">หุ้นสหรัฐหลัก</button>
-        <button class="btn blue" onclick="setชุดที่สแกน('gold')">ทองคำ/เหมืองทอง</button>
-        <button class="btn primary" onclick="setชุดที่สแกน('all')">All Core</button>
+        <button class="btn blue" onclick="setUniverse('watchlist')">Watchlist</button>
+        <button class="btn blue" onclick="setUniverse('thai')">หุ้นไทยหลัก</button>
+        <button class="btn blue" onclick="setUniverse('us')">หุ้นสหรัฐหลัก</button>
+        <button class="btn blue" onclick="setUniverse('gold')">ทองคำ/เหมืองทอง</button>
+        <button class="btn primary" onclick="setUniverse('all')">All Core</button>
       </div>
-      <div style="margin-top:10px"><label>น่าจับตาlist คั่นด้วย comma</label><textarea id="watchlist"></textarea></div>
+      <div style="margin-top:10px"><label>Watchlist คั่นด้วย comma</label><textarea id="watchlist"></textarea></div>
       <div class="btns" style="margin-top:10px">
         <button class="btn green" onclick="refreshAndScan()">สแกนใหม่</button>
         <button class="btn red" onclick="resetAll()">รีเซ็ตค่าในเครื่อง</button>
@@ -180,45 +181,38 @@ const DEFAULT={
 };
 
 let state=loadState(), side='tae';
-const scanProgressBar=$id('scanProgressBar');
-const universeSelect=$id('universeSelect');
-const settingsPanel=$id('settingsPanel');
-const maxCacheHours=$id('maxCacheHours');
-const minTurnover=$id('minTurnover');
-const sumUniverse=$id('sumUniverse');
-const missingWrap=$id('missingWrap');
-const missingBox=$id('missingBox');
-const dailyTitle=$id('dailyTitle');
-const sumFetched=$id('sumFetched');
-const resultList=$id('resultList');
-const deepLimit=$id('deepLimit');
-const showWatch=$id('showWatch');
-const healthBox=$id('healthBox');
-const watchlist=$id('watchlist');
-const dailyNote=$id('dailyNote');
-const fundLimit=$id('fundLimit');
-const sideTitle=$id('sideTitle');
-const sumHealth=$id('sumHealth');
-const syncText=$id('syncText');
-const sumAplus=$id('sumAplus');
-const taeCount=$id('taeCount');
-const sideDesc=$id('sideDesc');
-const oilCount=$id('oilCount');
-const maxLoss=$id('maxLoss');
-const sumFund=$id('sumFund');
-const capital=$id('capital');
-const sumDeep=$id('sumDeep');
-const oilTab=$id('oilTab');
-const oilMin=$id('oilMin');
-const taeMin=$id('taeMin');
-const taeTab=$id('taeTab');
-const navOil=$id('navOil');
-const navTae=$id('navTae');
-const minRR=$id('minRR');
-const sumB=$id('sumB');
 
 function loadState(){try{return JSON.parse(localStorage.getItem(KEY))||structuredClone(DEFAULT)}catch(e){return structuredClone(DEFAULT)}}
 function saveState(){localStorage.setItem(KEY,JSON.stringify(state))}
+
+function el(id){return document.getElementById(id)}
+function getNumber(id, fallback){
+  const node=el(id);
+  if(!node) return fallback;
+  const raw=String(node.value ?? '').trim();
+  if(raw==='') return fallback;
+  const n=Number(raw);
+  return Number.isFinite(n) ? n : fallback;
+}
+function getText(id, fallback){
+  const node=el(id);
+  if(!node) return fallback;
+  const raw=String(node.value ?? '').trim();
+  return raw==='' ? fallback : raw;
+}
+function setVal(id, value){
+  const node=el(id);
+  if(node) node.value = value ?? '';
+}
+function setText(id, value){
+  const node=el(id);
+  if(node) node.textContent = value ?? '';
+}
+function setHTML(id, value){
+  const node=el(id);
+  if(node) node.innerHTML = value ?? '';
+}
+
 function saveLastGood(payload){try{localStorage.setItem(CACHE_KEY,JSON.stringify(payload))}catch(e){}}
 function loadLastGood(){try{return JSON.parse(localStorage.getItem(CACHE_KEY))}catch(e){return null}}
 function fmt(n){return new Intl.NumberFormat('th-TH',{maximumFractionDigits:0}).format(Number(n||0))}
@@ -301,7 +295,7 @@ function getSignals(){
 function gradeRank(g){return g==='A+'?2:g==='B'?1:0}
 
 async function refreshAndScan(){
-  const syms=selectedSymbols(); syncText.textContent=`สแกน 0/${syms.length}`; setProgress(15);
+  const syms=selectedSymbols(); setText('syncText',`สแกน 0/${syms.length}`); setProgress(15);
   try{
     const url='/.netlify/functions/yahoo?symbols='+encodeURIComponent(syms.join(','))+'&deepLimit='+encodeURIComponent(state.settings.deepLimit||70)+'&fundLimit='+encodeURIComponent(state.settings.fundLimit||25);
     const res=await fetch(url); const data=await res.json().catch(()=>null);
@@ -309,20 +303,20 @@ async function refreshAndScan(){
     state.quotes=(data.quotes||[]).map(q=>({...q,source:q.source||'live'})); state.lastUpdate=new Date().toISOString(); state.lastRequested=syms.length; state.lastUniverse=state.settings.universe||'all'; state.deepCount=data.deepCount||0; state.fundCount=data.fundCount||0; state.dataMode='live'; state.fetchError='';
     const got=new Set(state.quotes.map(q=>String(q.symbol||'').toUpperCase())); state.missing=syms.filter(s=>!got.has(s));
     saveState(); saveLastGood({quotes:state.quotes,lastUpdate:state.lastUpdate,lastRequested:state.lastRequested,lastUniverse:state.lastUniverse,deepCount:state.deepCount,fundCount:state.fundCount,missing:state.missing});
-    setProgress(100); syncText.textContent='อัปเดตแล้ว'; showToast(`ดึงสดได้ ${state.quotes.length}/${syms.length} • เช็กกราฟ ${state.deepCount} • พื้นฐาน ${state.fundCount}`);
+    setProgress(100); setText('syncText','อัปเดตแล้ว'); showToast(`ดึงสดได้ ${state.quotes.length}/${syms.length} • เช็กกราฟ ${state.deepCount} • พื้นฐาน ${state.fundCount}`);
   }catch(e){
     console.error(e); state.fetchError=e.message||'unknown';
     const cached=loadLastGood();
     if(cached&&cached.quotes&&cached.quotes.length){
       state.quotes=cached.quotes.map(q=>({...q,source:'cache'})); state.lastUpdate=cached.lastUpdate; state.lastRequested=cached.lastRequested; state.lastUniverse=cached.lastUniverse; state.deepCount=cached.deepCount||0; state.fundCount=cached.fundCount||0; state.missing=cached.missing||[]; state.dataMode='cache';
-      saveState(); setProgress(65); syncText.textContent='ใช้ข้อมูลสำรอง'; showToast('ดึงสดไม่ได้ ใช้ข้อมูลล่าสุดที่เคยดึงได้แทน');
+      saveState(); setProgress(65); setText('syncText','ใช้ข้อมูลสำรอง'); showToast('ดึงสดไม่ได้ ใช้ข้อมูลล่าสุดที่เคยดึงได้แทน');
     }else{
-      state.dataMode='degraded'; state.quotes=[]; state.missing=syms; saveState(); syncText.textContent='ข้อมูลไม่พร้อม'; showToast('ดึงข้อมูลไม่ได้ และยังไม่มีข้อมูลสำรอง');
+      state.dataMode='degraded'; state.quotes=[]; state.missing=syms; saveState(); setText('syncText','ข้อมูลไม่พร้อม'); showToast('ดึงข้อมูลไม่ได้ และยังไม่มีข้อมูลสำรอง');
     }
   }
-  render(); setTimeout(()=>syncText.textContent='พร้อม',1700)
+  render(); setTimeout(()=>setText('syncText','พร้อม'),1700)
 }
-function setProgress(v){scanProgressBar.style.width=v+'%'}
+function setProgress(v){const bar=el('scanProgressBar'); if(bar) bar.style.width=v+'%'}
 function healthText(){
   if(state.dataMode==='live') return isStale()?'สดแต่เก่า':'ข้อมูลสด';
   if(state.dataMode==='cache') return isVeryStale()?'ข้อมูลสำรองเก่า':'ใช้ข้อมูลสำรอง';
@@ -338,17 +332,40 @@ function healthMessage(){
 function render(){
   const s=getSignals(), syms=selectedSymbols(), list=side==='tae'?s.tae:s.oil;
   const taeA=s.tae.filter(x=>x.grade==='A+').length, oilA=s.oil.filter(x=>x.grade==='A+').length, aPlus=taeA+oilA, bCount=s.tae.filter(x=>x.grade==='B').length+s.oil.filter(x=>x.grade==='B').length;
-  taeCount.textContent=`${taeA}/${s.tae.length}`; oilCount.textContent=`${oilA}/${s.oil.length}`;
-  taeTab.classList.toggle('active',side==='tae'); oilTab.classList.toggle('active',side==='oil'); navTae.classList.toggle('active',side==='tae'); navOil.classList.toggle('active',side==='oil');
-  sideTitle.textContent=side==='tae'?'TAE VI — ตัวน่าซื้อ / น่าจับตา':'Oil หุ้นซิ่ง — ตัวน่าซื้อ / น่าจับตา';
-  sideDesc.textContent=side==='tae'?'ถ้าข้อมูลไม่สดหรือใช้ cache ระบบจะลดระดับ ไม่ให้ขึ้นน่าซื้อง่าย':'ตัวน่าเล่นต้องมีข้อมูลสด กราฟละเอียด และแผนคุ้มพอ';
-  dailyTitle.textContent=`วันนี้ตัวน่าซื้อ: TAE ${taeA} / Oil ${oilA}`;
-  dailyNote.textContent=state.lastUpdate?`อัปเดตล่าสุด ${new Date(state.lastUpdate).toLocaleString('th-TH')} • ${state.lastUniverse} • ดึงได้ ${state.quotes.length}/${state.lastRequested||syms.length} • สถานะ: ${healthText()}`:`ชุดสแกนปัจจุบัน: ${state.settings.universe||'all'} • เตรียมสแกน ${syms.length} ตัว`;
-  sumUniverse.textContent=state.settings.universe||'all'; sumFetched.textContent=`${state.quotes.length}/${state.lastRequested||syms.length}`; sumAplus.textContent=aPlus; sumB.textContent=bCount; sumDeep.textContent=state.deepCount||0; sumFund.textContent=state.fundCount||0; sumHealth.textContent=healthText();
-  healthBox.textContent='สถานะข้อมูล: '+healthMessage();
-  missingWrap.classList.toggle('hide',!(state.missing&&state.missing.length)); missingBox.textContent=(state.missing||[]).join(', ');
-  resultList.innerHTML=list.length?`<div class="list">${list.map(card).join('')}</div>`:emptyHtml();
-  capital.value=state.settings.capital; maxLoss.value=state.settings.maxLoss; taeMin.value=state.settings.taeMin; oilMin.value=state.settings.oilMin; minTurnover.value=state.settings.minTurnover; minRR.value=state.settings.minRR; deepLimit.value=state.settings.deepLimit; fundLimit.value=state.settings.fundLimit; universeSelect.value=state.settings.universe||'all'; watchlist.value=state.settings.watchlist; showWatch.value=state.settings.showWatch||'yes'; maxCacheHours.value=state.settings.maxCacheHours||24;
+  setText('taeCount',`${taeA}/${s.tae.length}`);
+  setText('oilCount',`${oilA}/${s.oil.length}`);
+  el('taeTab')?.classList.toggle('active',side==='tae');
+  el('oilTab')?.classList.toggle('active',side==='oil');
+  el('navTae')?.classList.toggle('active',side==='tae');
+  el('navOil')?.classList.toggle('active',side==='oil');
+  setText('sideTitle',side==='tae'?'TAE VI — ตัวน่าซื้อ / น่าจับตา':'Oil หุ้นซิ่ง — ตัวน่าซื้อ / น่าจับตา');
+  setText('sideDesc',side==='tae'?'ถ้าข้อมูลไม่สดหรือใช้ข้อมูลสำรอง ระบบจะลดระดับ ไม่ให้ขึ้นน่าซื้อง่าย':'ตัวน่าเล่นต้องมีข้อมูลสด กราฟละเอียด และแผนคุ้มพอ');
+  setText('dailyTitle',`วันนี้ตัวน่าซื้อ: TAE ${taeA} / Oil ${oilA}`);
+  setText('dailyNote',state.lastUpdate?`อัปเดตล่าสุด ${new Date(state.lastUpdate).toLocaleString('th-TH')} • ${state.lastUniverse} • ดึงได้ ${state.quotes.length}/${state.lastRequested||syms.length} • สถานะ: ${healthText()}`:`ชุดสแกนปัจจุบัน: ${state.settings.universe||'all'} • เตรียมสแกน ${syms.length} ตัว`);
+  setText('sumUniverse',state.settings.universe||'all');
+  setText('sumFetched',`${state.quotes.length}/${state.lastRequested||syms.length}`);
+  setText('sumAplus',aPlus);
+  setText('sumB',bCount);
+  setText('sumDeep',state.deepCount||0);
+  setText('sumFund',state.fundCount||0);
+  setText('sumHealth',healthText());
+  setText('healthBox','สถานะข้อมูล: '+healthMessage());
+  el('missingWrap')?.classList.toggle('hide',!(state.missing&&state.missing.length));
+  setText('missingBox',(state.missing||[]).join(', '));
+  setHTML('resultList',list.length?`<div class="list">${list.map(card).join('')}</div>`:emptyHtml());
+
+  setVal('capital',state.settings.capital ?? 10000000);
+  setVal('maxLoss',state.settings.maxLoss ?? 300000);
+  setVal('taeMin',state.settings.taeMin ?? 80);
+  setVal('oilMin',state.settings.oilMin ?? 80);
+  setVal('minTurnover',state.settings.minTurnover ?? 20000000);
+  setVal('minRR',state.settings.minRR ?? 1.5);
+  setVal('deepLimit',state.settings.deepLimit ?? 70);
+  setVal('fundLimit',state.settings.fundLimit ?? 25);
+  setVal('universeSelect',state.settings.universe || 'all');
+  setVal('watchlist',state.settings.watchlist || DEFAULT.settings.watchlist);
+  setVal('showWatch',state.settings.showWatch || 'yes');
+  setVal('maxCacheHours',state.settings.maxCacheHours ?? 24);
 }
 function emptyHtml(){return `<div class="empty"><div><div class="zero">0</div><b>วันนี้ไม่มีตัวที่ควรยุ่ง</b><span>${state.dataMode==='degraded'?'ข้อมูลไม่พร้อม ระบบจึงไม่ให้สัญญาณ':'ถ้าไม่มีตัวที่ดีพอ ให้ถือเงินสด ไม่ต้องฝืนซื้อ'}</span></div></div>`}
 function card(a){
@@ -361,12 +378,33 @@ function card(a){
   <div class="reason">${reason}</div><div class="danger">ถ้ายอมเสีย ${fmt(state.settings.maxLoss)} บาท ซื้อได้ประมาณ ${fmt(qty)} หุ้น/หน่วย ใช้เงินราว ${fmt(moneyNeed)} ${a.currency}</div><div class="mini" style="margin-top:8px">${a.sector?`กลุ่มธุรกิจ: ${a.sector}${a.industry?' • '+a.industry:''}`:''} ${a.note||''}</div></article>`
 }
 function setUniverse(mode){state.settings.universe=mode; if(mode!=='watchlist')state.settings.watchlist=UNIVERSES[mode].join(','); saveState(); render(); showToast(`เลือกชุดสแกน: ${mode} (${selectedSymbols().length} ตัว)`)}
-function setSide(s){side=s;settingsPanel.classList.add('hide');render();window.scrollTo({top:0,behavior:'smooth'})}
-function toggleSettings(){settingsPanel.classList.toggle('hide'); if(!settingsPanel.classList.contains('hide'))setTimeout(()=>settingsPanel.scrollIntoView({behavior:'smooth'}),50)}
-function saveSettings(){state.settings={capital:+capital.value||0,maxLoss:+maxLoss.value||0,taeMin:+taeMin.value||80,oilMin:+oilMin.value||80,minTurnover:+minTurnover.value||20000000,minRR:+minRR.value||1.5,universe:universeSelect.value||state.settings.universe||'all',watchlist:watchlist.value||DEFAULT.settings.watchlist,deepLimit:+deepLimit.value||70,fundLimit:+fundLimit.value||25,showWatch:showWatch.value||'yes',maxCacheHours:+maxCacheHours.value||24}; saveState();render();showToast('บันทึกแล้ว')}
+function setSide(s){side=s; el('settingsPanel')?.classList.add('hide'); render(); window.scrollTo({top:0,behavior:'smooth'})}
+function toggleSettings(){const p=el('settingsPanel'); if(!p)return; p.classList.toggle('hide'); if(!p.classList.contains('hide'))setTimeout(()=>p.scrollIntoView({behavior:'smooth'}),50)}
+function saveSettings(){
+  const prev = state.settings || {};
+  const newSettings = {
+    capital: getNumber('capital', prev.capital ?? 10000000),
+    maxLoss: getNumber('maxLoss', prev.maxLoss ?? 300000),
+    taeMin: getNumber('taeMin', prev.taeMin ?? 80),
+    oilMin: getNumber('oilMin', prev.oilMin ?? 80),
+    minTurnover: getNumber('minTurnover', prev.minTurnover ?? 20000000),
+    minRR: getNumber('minRR', prev.minRR ?? 1.5),
+    universe: getText('universeSelect', prev.universe || 'all'),
+    watchlist: getText('watchlist', prev.watchlist || DEFAULT.settings.watchlist),
+    deepLimit: getNumber('deepLimit', prev.deepLimit ?? 70),
+    fundLimit: getNumber('fundLimit', prev.fundLimit ?? 25),
+    showWatch: getText('showWatch', prev.showWatch || 'yes'),
+    maxCacheHours: getNumber('maxCacheHours', prev.maxCacheHours ?? 24)
+  };
+  state.settings = newSettings;
+  saveState();
+  render();
+  showToast(`บันทึกแล้ว: เงินทุน ${fmt(state.settings.capital)} / ขาดทุนต่อดีล ${fmt(state.settings.maxLoss)}`);
+}
 function resetAll(){if(confirm('รีเซ็ตข้อมูลที่ browser จำไว้ทั้งหมด?')){localStorage.removeItem(KEY);localStorage.removeItem(CACHE_KEY);location.reload()}}
 function showToast(msg){const old=document.querySelector('.toast');if(old)old.remove();const t=document.createElement('div');t.className='toast';t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),3000)}
 render();
+er();
 </script>
 
 </body>
